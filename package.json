@@ -4,13 +4,17 @@
   "description": "",
   "main": "build/index.js",
   "scripts": {
-    "start":"node build/index.js",
+    "start": "node build/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/node": "^22.10.2",
     "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "uuid": "^11.0.3"
   }
 }
