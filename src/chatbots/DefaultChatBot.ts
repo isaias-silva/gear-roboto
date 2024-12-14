@@ -13,22 +13,21 @@ export class DefaultChatBot<E extends DefaultEngine, T extends DefaultTransporte
         this.id = uuidv4()
         this.engine = eng;
         this.transporter = tr;
+        console.log(this)
     }
 
     async send(to: string, message: IMessageSend) {
-
+        this.engine.send()
     };
     async init() {
-        return await this.engine.connect();
+        
+        await this.engine.connect([this.id]);
     }
     async observer() {
-        this.engine.getEmitter().on("connection", (data) => {
-            this.transporter.getEmitter().emit("connection", data)
-        })
 
-        
-        this.engine.getEmitter().on("connection", (msg) => this.transporter.transportInfo("connection", msg))
-        this.engine.getEmitter().on("message", (msg) => this.transporter.transportInfo("message", msg))
+
+        this.engine.getEmitter().on("g.conn", (msg) => this.transporter.transportInfoConn(msg))
+        this.engine.getEmitter().on("g.msg", (msg) => this.transporter.transportInfoMsg(msg))
 
     }
 }

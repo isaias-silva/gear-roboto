@@ -1,12 +1,13 @@
-import EventEmitter from "events"
+import { EventGearEmitter } from "./EventGearEmitter";
 
 export class Gear {
-    protected ev: EventEmitter
+    protected ev: EventGearEmitter
 
     constructor() {
-        this.ev = new EventEmitter()
+        this.ev = new EventGearEmitter()
     }
     getEmitter() {
         return this.ev;
     }
+    
 }
