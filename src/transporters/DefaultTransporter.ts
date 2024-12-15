@@ -1,5 +1,4 @@
 import { Gear } from "../core/Gear";
-import { Events } from "../interfaces/Events";
 import { IMessageConnection } from "../interfaces/IMessageConnection";
 import { IMessageReceived } from "../interfaces/IMessageReceived";
 
@@ -9,6 +8,7 @@ export class DefaultTransporter extends Gear {
 
         this.ev.emit("g.conn", msg)
     }
+
 
     transportInfoMsg(msg: IMessageReceived) {
 
