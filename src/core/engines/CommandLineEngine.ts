@@ -6,8 +6,8 @@ export class CommandLineEngine extends DefaultEngine {
 
 
     async send(to: string, message: IMessageSend) {
-        
-        console.log("bot: " + message.text)
+        const{text,type}=message
+        this.ev.emit('g.msg', { type, author:"me", text, isGroup: false });
 
     }
 
@@ -18,7 +18,7 @@ export class CommandLineEngine extends DefaultEngine {
                 output: process.stdout,
             });
 
-            const text = await rl.question("you: ")
+            const text = await rl.question(":")
             const author = "you"
 
             this.ev.emit('g.msg', { type: "text", author, text, isGroup: false });

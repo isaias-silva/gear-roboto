@@ -5,7 +5,7 @@ import { DefaultEngine } from "./core/engines/DefaultEngine";
 import { DefaultTransporter } from "./core/transporters/DefaultTransporter";
 
 
-const commander = new DefaultCommander("#")
+const commander = new DefaultCommander("/")
 commander.addCommand("hello", (e: DefaultEngine, author: string) => e.send(author, { type: "text", text: "world" }))
 commander.addCommand("ping", (e: DefaultEngine, author: string) => e.send(author, { type: "text", text: "pong" }))
 commander.addCommand("sum", (e: DefaultEngine, author: string, args?: string[]) => {
@@ -23,7 +23,8 @@ commander.addCommand("sum", (e: DefaultEngine, author: string, args?: string[]) 
 })
 
 const engine = new CommandLineEngine(commander)
-const transporter = new DefaultTransporter()
+const transporter = new DefaultTransporter(true)
+
 const chatbot = new DefaultChatBot(engine, transporter)
 
 chatbot.init()

@@ -16,8 +16,11 @@ export class DefaultTransporter extends Gear {
     transportInfoMsg(msg: IMessageReceived) {
 
         if (this.eneableLogs) {
-
-            console.log(msg)
+            const { author, text } = msg
+            console.log(`[${author}]: ${text}`)
         }
+
     }
+
+
 }
