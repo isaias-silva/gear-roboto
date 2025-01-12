@@ -1,4 +1,5 @@
-import { IMessageSend } from "../interfaces/IMessageSend";
+import { IMessageSend } from "../../interfaces/IMessageSend";
+import { DefaultCommander } from "../commander/DefaultCommander";
 import { DefaultEngine } from "../engines/DefaultEngine";
 import { DefaultTransporter } from "../transporters/DefaultTransporter";
 import { v4 as uuidv4 } from 'uuid';
@@ -13,11 +14,13 @@ export class DefaultChatBot<E extends DefaultEngine, T extends DefaultTransporte
         this.id = uuidv4()
         this.engine = eng;
         this.transporter = tr;
+      
 
     }
 
     async send(to: string, message: IMessageSend) {
-        this.engine.send()
+        this.engine.send(to, message)
+
     };
     async init() {
         await this.observer();
@@ -28,7 +31,7 @@ export class DefaultChatBot<E extends DefaultEngine, T extends DefaultTransporte
 
 
         this.engine.getEmitter().on("g.conn", (msg) => this.transporter.transportInfoConn(msg))
-        
+
         this.engine.getEmitter().on("g.msg", (msg) => this.transporter.transportInfoMsg(msg))
 
     }

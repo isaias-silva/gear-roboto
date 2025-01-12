@@ -1,6 +1,6 @@
 export interface IMessageSend {
     text?: string,
     reply?: string,
-    type: string,
+    type: "text" | "image" | "video" | "document" | "file",
     media?: Buffer | string
 }
