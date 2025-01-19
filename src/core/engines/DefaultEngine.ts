@@ -4,10 +4,24 @@ import { IMessageConnection } from "../../interfaces/IMessageConnection";
 import { IMessageSend } from "../../interfaces/IMessageSend";
 import { DefaultCommander } from "../commander/DefaultCommander";
 
+
+/**
+ * Description default engine of chatbot
+ *
+ * @export
+ * @class DefaultEngine
+ * @typedef {DefaultEngine}
+ * @extends {Gear}
+ */
 export class DefaultEngine extends Gear {
 
     protected commander?: DefaultCommander;
 
+    /**
+    * Creates a new instance of DefaultEngine.
+    * 
+    * @param {DefaultCommander} cm - The optional commander.
+    */
     constructor(cm?: DefaultCommander) {
         super()
         this.commander = cm
@@ -15,7 +29,16 @@ export class DefaultEngine extends Gear {
 
     status: IMessageConnection['status'] = 'disconnected'
 
-    async connect(args: string[]) {
+
+
+    /**
+     * connect engine with args
+     *
+     * @async
+     * @param {string[]} args 
+     * @returns {void}
+     */
+    async connect(args: string[]): Promise<void> {
 
         const [id] = args
 
@@ -32,15 +55,39 @@ export class DefaultEngine extends Gear {
     }
 
 
-    async disconnect() {
+    /**
+     * disconnect engine
+     *
+     * @async
+     * @returns {void}
+     */
+    async disconnect(): Promise<void> {
         this.status = 'disconnected'
         this.ev.removeAllListeners();
     }
 
-    async send(to: string, message: IMessageSend) {
-        
+
+
+    /**
+     * Send message in engine
+     *
+     * @async
+     * @param {string} to 
+     * @param {IMessageSend} message 
+     * @returns {Promise<void>} 
+     */
+    async send(to: string, message: IMessageSend): Promise<void> { }
+
+
+
+    /**
+     * observer engine events
+     *
+     * @protected
+     * @async
+     * @returns {Promise<void>} 
+     */
+    protected async monitoring(): Promise<void> {
 
     }
-
-    protected async monitoring() {}
 }
