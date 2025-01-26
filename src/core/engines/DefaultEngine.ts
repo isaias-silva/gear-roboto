@@ -61,8 +61,14 @@ export class DefaultEngine extends Gear {
      * @async
      * @returns {void}
      */
-    async disconnect(): Promise<void> {
-        this.status = 'disconnected'
+    async disconnect(args: string[]): Promise<void> {
+        this.status = "disconnected";
+        const [id] = args
+
+        const adInfo = new Map()
+        adInfo.set('id', id)
+
+        this.ev.emit('g.conn', { status: this.status, adInfo })
         this.ev.removeAllListeners();
     }
 

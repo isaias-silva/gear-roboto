@@ -69,13 +69,24 @@ export class DefaultChatBot<E extends DefaultEngine, T extends DefaultTransporte
     }
 
     /**
+    * end the chatbot process.
+    * 
+    * @async
+    * @returns {Promise<void>} Resolves when the chatbot disconnect.
+    */
+    async end(): Promise<void> {
+        await this.observer();
+        this.engine.disconnect([this.id]);
+    }
+
+    /**
      * Observes engine events and delegates them to the transporter.
      * 
      * @private
      * @async
      * @returns {Promise<void>} Resolves when the observer is set up.
      */
-    
+
     private async observer(): Promise<void> {
         this.engine.getEmitter().on("g.conn", (msg) => this.transporter.transportInfoConn(msg));
         this.engine.getEmitter().on("g.msg", (msg) => this.transporter.transportInfoMsg(msg));
