@@ -15,9 +15,9 @@ export class DefaultTransporter extends Gear {
      * Logs connection information if logging is enabled.
      * @param {IMessageConnection} msg - The message containing connection information.
      */
-    transportInfoConn(msg: IMessageConnection): void {
+     transportInfoConn(msg: IMessageConnection): void {
         if (this.eneableLogs) {
-            console.log(msg);
+            this.logger.debug(DefaultTransporter.name, msg);
         }
     }
 
@@ -25,10 +25,11 @@ export class DefaultTransporter extends Gear {
      * Logs received message information if logging is enabled.
      * @param {IMessageReceived} msg - The message containing details of the received communication.
      */
-    transportInfoMsg(msg: IMessageReceived): void {
+     transportInfoMsg(msg: IMessageReceived): void {
         if (this.eneableLogs) {
             const { author, text } = msg;
-            console.log(`[${author}]: ${text}`);
+            this.logger.debug(DefaultTransporter.name, `[${author}]: ${text}`);
         }
     }
+    
 }

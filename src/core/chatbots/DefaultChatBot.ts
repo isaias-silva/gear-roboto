@@ -75,8 +75,8 @@ export class DefaultChatBot<E extends DefaultEngine, T extends DefaultTransporte
     * @returns {Promise<void>} Resolves when the chatbot disconnect.
     */
     async end(): Promise<void> {
-        await this.observer();
         this.engine.disconnect([this.id]);
+        this.transporter.closeEmitter()
     }
 
     /**

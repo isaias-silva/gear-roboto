@@ -3,7 +3,7 @@
  */
 
 import { EventGearEmitter } from "./EventGearEmitter";
-
+import { Logger, pino } from "pino";
 /**
  * Base class representing a gear mechanism with event emitting and logging capabilities.
  */
@@ -11,8 +11,10 @@ export class Gear {
     /** Indicates whether logging is enabled. */
     protected eneableLogs: boolean;
 
+    protected logger: Logger;
     /** Instance of the event emitter for managing gear-related events. */
-    protected ev: EventGearEmitter;
+    private ev: EventGearEmitter;
+
 
     /**
      * Creates a new instance of `Gear`.
@@ -21,6 +23,8 @@ export class Gear {
     constructor(eneableLogs?: boolean) {
         this.ev = new EventGearEmitter();
         this.eneableLogs = eneableLogs || false;
+        this.logger = pino()
+        
     }
 
     /**
@@ -30,4 +34,12 @@ export class Gear {
     getEmitter(): EventGearEmitter {
         return this.ev;
     }
+    /**
+     * close emitter of this gear.
+     * @returns {void} 
+     */
+    closeEmitter(): void {
+        this.ev.removeAllListeners();
+    }
+
 }

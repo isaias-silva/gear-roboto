@@ -20,6 +20,7 @@
     "typescript": "^5.7.2"
   },
   "dependencies": {
+    "pino": "^9.6.0",
     "uuid": "^11.0.3"
   }
 }

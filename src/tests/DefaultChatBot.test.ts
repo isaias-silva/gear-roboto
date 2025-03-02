@@ -11,17 +11,19 @@ describe("test default chatbot class", () => {
     let engine: DefaultEngine
 
     beforeEach(() => {
-    
+
         engine = {
             connect: async (args: string[]) => { },
             send: async (to: string, message: IMessageSend) => { },
             getEmitter: () => new EventGearEmitter(),
             disconnect: async (args: string[]) => { },
 
+
         } as DefaultEngine
 
         transporter = {
-            getEmitter: () => new EventGearEmitter()
+            getEmitter: () => new EventGearEmitter(),
+            closeEmitter: () => { }
         } as DefaultTransporter
 
         chatbot = new DefaultChatBot(engine, transporter)
@@ -35,20 +37,23 @@ describe("test default chatbot class", () => {
         expect(chatbot).toBeDefined();
     });
 
-    test("should connect",async()=>{
-        const spyConnection=jest.spyOn(engine,"connect");
-        
+    test("should connect", async () => {
+        const spyConnection = jest.spyOn(engine, "connect");
+
         await chatbot.init()
 
         expect(spyConnection).toHaveBeenCalled()
 
     })
-    test("should disconnect",async()=>{
-        const spyDisconnection=jest.spyOn(engine,"disconnect");
-        
+    test("should disconnect", async () => {
+        const spyDisconnection = jest.spyOn(engine, "disconnect");
+        const spyCloseEmitterTransporter = jest.spyOn(transporter, "closeEmitter");
+
         await chatbot.end()
 
         expect(spyDisconnection).toHaveBeenCalled()
+        expect(spyCloseEmitterTransporter).toHaveBeenCalled()
+    
     })
 
 })

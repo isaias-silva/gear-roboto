@@ -1,6 +1,4 @@
 import EventEmitter from "events";
-import { IMessageReceived } from "../interfaces/IMessageReceived";
-import { IMessageConnection } from "../interfaces/IMessageConnection";
 import { Events } from "../interfaces/Events";
 
 

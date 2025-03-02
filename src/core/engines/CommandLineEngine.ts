@@ -7,7 +7,7 @@ export class CommandLineEngine extends DefaultEngine {
 
     async send(to: string, message: IMessageSend) {
         const{text,type}=message
-        this.ev.emit('g.msg', { type, author:"me", text, isGroup: false });
+        this.getEmitter().emit('g.msg', { type, author:"me", text, isGroup: false });
 
     }
 
@@ -21,7 +21,7 @@ export class CommandLineEngine extends DefaultEngine {
             const text = await rl.question(":")
             const author = "you"
 
-            this.ev.emit('g.msg', { type: "text", author, text, isGroup: false });
+            this.getEmitter().emit('g.msg', { type: "text", author, text, isGroup: false });
 
             if (this.commander && this.commander?.isCommand(text)) {
                 const { command, args } = this.commander.extractCommandAndArgs(text)

@@ -40,6 +40,7 @@ export class DefaultEngine extends Gear {
      */
     async connect(args: string[]): Promise<void> {
 
+       
         const [id] = args
 
         this.status = 'connected'
@@ -48,9 +49,10 @@ export class DefaultEngine extends Gear {
 
         adInfo.set('id', id)
 
-        this.ev.emit('g.conn', { status: this.status, adInfo })
+        this.getEmitter().emit('g.conn', { status: this.status, adInfo })
 
         this.monitoring();
+       
 
     }
 
@@ -68,8 +70,8 @@ export class DefaultEngine extends Gear {
         const adInfo = new Map()
         adInfo.set('id', id)
 
-        this.ev.emit('g.conn', { status: this.status, adInfo })
-        this.ev.removeAllListeners();
+        this.getEmitter().emit('g.conn', { status: this.status, adInfo })
+        this.closeEmitter()
     }
 
 
