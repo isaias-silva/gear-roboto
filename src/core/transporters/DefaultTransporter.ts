@@ -19,6 +19,7 @@ export class DefaultTransporter extends Gear {
         if (this.eneableLogs) {
             this.logger.info(msg);
         }
+        this.treatInfoConn(msg)
     }
 
     /**
@@ -29,6 +30,23 @@ export class DefaultTransporter extends Gear {
         if (this.eneableLogs) {
             this.logger.info(msg);
         }
+        this.treatInfoMsg(msg)
     }
     
+
+    /**
+     * treat msg object
+     * @param {IMessageConnection} msg - The message containing details of the received communication.
+     */
+    protected treatInfoConn(msg: IMessageConnection){
+
+    }
+
+    /**
+     * treat msg object
+     * @param {IMessageConnection} msg - The message containing details of the received communication.
+     */
+    protected treatInfoMsg(msg: IMessageReceived){
+
+    }
 }
