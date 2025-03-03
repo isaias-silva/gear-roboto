@@ -12,13 +12,13 @@ export class CommandLineEngine extends DefaultEngine {
     }
 
     async monitoring() {
+        const rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout,
+        });
         while (this.status == 'connected') {
-            const rl = readline.createInterface({
-                input: process.stdin,
-                output: process.stdout,
-            });
-
-            const text = await rl.question(":")
+          
+            const text = await rl.question("")
             const author = "you"
 
             this.getEmitter().emit('g.msg', { type: "text", author, text, isGroup: false });
@@ -36,8 +36,9 @@ export class CommandLineEngine extends DefaultEngine {
 
 
 
-            rl.close()
+          
 
         }
+        rl.close()
     }
 }

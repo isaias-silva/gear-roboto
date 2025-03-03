@@ -27,8 +27,7 @@ export class DefaultTransporter extends Gear {
      */
      transportInfoMsg(msg: IMessageReceived): void {
         if (this.eneableLogs) {
-            const { author, text } = msg;
-            this.logger.info(`[${author}]: ${text}`);
+            this.logger.info(msg);
         }
     }
     
