@@ -1,15 +1,16 @@
 {
   "name": "gear-roboto",
   "version": "1.0.0",
-  "description": "",
-  "main": "build/index.js",
+  "description": "a framework to facilitate the creation of chatbots",
+ 
   "scripts": {
     "start": "node build/index.js",
     "dev": "ts-node-dev ./src/index.ts test",
+    "build":"tsc",
     "test": "jest"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["chatbot","automation" ,"typescript", "node"],
+  "author": "Seu Nome",
   "license": "ISC",
   "devDependencies": {
     "@types/jest": "^29.5.14",
@@ -23,5 +24,12 @@
     "pino": "^9.6.0",
     "pino-pretty": "^13.0.0",
     "uuid": "^11.0.3"
+  },
+  "files": [
+    "build"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/seu-usuario/minha-biblioteca.git"
   }
 }

@@ -2,3 +2,4 @@ node_modules
 .git
 tests
 .env
+jest.config.js
