@@ -121,6 +121,6 @@ chatbot.send("you", { type: "text", text: "Digite algum comando iniciando por !"
 
 ## 📜 Licença
 
-MIT © [Seu Nome ou Organização]
+ISC © isaias-silva
 
 
