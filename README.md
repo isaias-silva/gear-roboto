@@ -1,14 +1,14 @@
 # gear-roboto
 
-**gear-roboto** é um mini framework para criar e organizar a lógica de chatbots, permitindo o transporte de mensagens e o monitoramento de eventos.
+**gear-roboto** is a mini framework for creating and organizing chatbot logic, allowing message transport and event monitoring.
 
-## 🚀 Instalação
+## 🚀 Installation
 
 ```sh
 npm install gear-roboto
 ```
 
-## 🔥 Exemplo de Uso
+## 🔥 Usage Example
 
 ```typescript
 import { DefaultChatBot, DefaultCommander, CommandLineEngine, CommandLineTransporter } from "gear-roboto";
@@ -22,42 +22,40 @@ async function main() {
     
     const chatbot = new DefaultChatBot(engine, transporter);
     await chatbot.init();
-    chatbot.send("you", { type: "text", text: "Digite algum comando iniciando por !" });
+    chatbot.send("you", { type: "text", text: "Enter a command starting with !" });
 }
 
 main();
 ```
 
 ---
+## 🛠 Main Structure
 
-## 🛠 Estrutura Principal
+The library has four main classes:
 
-A biblioteca possui quatro classes principais:
+1. **Commander** – Manages the chatbot's commands.
+2. **Engine** – Controls external interactions.
+3. **Transporter** – Manages the transport of messages and events.
+4. **Chatbot** – Provides communication between the Engine and Transporter.
 
-1. **Commander** – Gerencia os comandos do chatbot.
-2. **Engine** – Controla as interações externas.
-3. **Transporter** – Gerencia o transporte de mensagens e eventos.
-4. **Chatbot** – Faz a comunicação entre Engine e Transporter.
+### 🎯 Commander (Command Manager)
 
-### 🎯 Commander (Gerenciador de Comandos)
-
-O **Commander** é responsável por gerenciar os comandos do chatbot. Ao instanciá-lo, você define um prefixo para os comandos:
+The **Commander** is responsible for managing the chatbot's commands. When instantiating it, you define a prefix for the commands:
 
 ```typescript
-const commander = new DefaultCommander("/");
-```
+const commander = new DefaultCommander("/"); ```
 
-Adicione comandos com callbacks:
+Add commands with callbacks:
 
 ```typescript
 commander.addCommand("hello", (engine, author, args) => {
-    engine.send(author, { text: "world", type: "text" });
+engine.send(author, { text: "world", type: "text" });
 });
 ```
 
-📌 **A callback recebe os parâmetros na seguinte ordem:** `engine, author, args`
+📌 **The callback receives the parameters in the following order:** `engine, author, args`
 
-Para que os comandos sejam processados, o **Commander** precisa ser injetado em um objeto **Engine**:
+For the commands to be processed, the **Commander** needs to be injected into an **Engine** object:
 
 ```typescript
 const engine = new CommandLineEngine(commander);
@@ -65,11 +63,11 @@ const engine = new CommandLineEngine(commander);
 
 ---
 
-### ⚙️ Engine (Gerenciador de Interações)
+### ⚙️ Engine (Interaction Manager)
 
-O **Engine** é responsável por lidar com interações externas. A classe base `DefaultEngine` pode ser estendida para diferentes plataformas.
+The **Engine** is responsible for handling external interactions. The base class `DefaultEngine` can be extended for different platforms.
 
-A **CommandLineEngine**, por exemplo, usa `readline` para interagir com o usuário:
+The **CommandLineEngine**, for example, uses `readline` to interact with the user:
 
 ```typescript
 async monitoring() {
@@ -95,11 +93,11 @@ Principais métodos da **Engine**:
 
 ---
 
-### 🔄 Transporter (Transportador de Mensagens)
+### 🔄 Transporter (Message Transporter)
 
-O **Transporter** gerencia o transporte de eventos e pode ser estendido para diferentes plataformas (RabbitMQ, WebSocket, Kafka, etc.).
+The **Transporter** manages the transport of events and can be extended to different platforms (RabbitMQ, WebSocket, Kafka, etc.).
 
-Exemplo com a **CommandLineTransporter**:
+Example with the **CommandLineTransporter**:
 
 ```typescript
 const transporter = new CommandLineTransporter();
@@ -107,20 +105,19 @@ const transporter = new CommandLineTransporter();
 
 ---
 
-### 🤖 Chatbot (Gerenciador Geral)
+### 🤖 Chatbot (General Manager)
 
-A classe **Chatbot** conecta a **Engine** ao **Transporter** e permite enviar mensagens sem acessar a Engine diretamente:
+The **Chatbot** class connects the **Engine** to the **Transporter** and allows you to send messages without accessing the Engine directly:
 
-```typescript
+
+```typescript 
 const chatbot = new DefaultChatBot(engine, transporter);
 await chatbot.init();
-chatbot.send("you", { type: "text", text: "Digite algum comando iniciando por !" });
-```
+chatbot.send("you", { type: "text", text: "Enter a command starting with !" });
+ ```
 
 ---
 
-## 📜 Licença
+## 📜 License
 
 ISC © isaias-silva
-
-
