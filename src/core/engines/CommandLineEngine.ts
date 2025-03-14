@@ -6,8 +6,8 @@ export class CommandLineEngine extends DefaultEngine {
 
 
     async send(to: string, message: IMessageSend) {
-        const{text,type}=message
-        this.getEmitter().emit('g.msg', { type, author:"me", text, isGroup: false });
+        const { text, type } = message
+        this.getEmitter().emit('g.msg', { type, author: "me", text, isGroup: false,messageId: Math.random().toString(32) });
 
     }
 
@@ -17,11 +17,11 @@ export class CommandLineEngine extends DefaultEngine {
             output: process.stdout,
         });
         while (this.status == 'connected') {
-          
+
             const text = await rl.question("")
             const author = "you"
 
-            this.getEmitter().emit('g.msg', { type: "text", author, text, isGroup: false });
+            this.getEmitter().emit('g.msg', { type: "text", author, text, isGroup: false, messageId: Math.random().toString(32) });
 
             if (this.commander && this.commander?.isCommand(text)) {
                 const { command, args } = this.commander.extractCommandAndArgs(text)
@@ -36,7 +36,7 @@ export class CommandLineEngine extends DefaultEngine {
 
 
 
-          
+
 
         }
         rl.close()

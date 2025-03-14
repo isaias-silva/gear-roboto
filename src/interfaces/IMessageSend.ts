@@ -1,6 +1,8 @@
+import { messageType } from "../types/MessageType";
+
 export interface IMessageSend {
     text?: string,
     reply?: string,
-    type: "text" | "image" | "video" | "document" | "file" | "audio",
+    type: messageType,
     media?: Buffer | string
 }

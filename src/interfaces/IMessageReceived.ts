@@ -1,7 +1,10 @@
+import { messageType } from "../types/MessageType";
+
 export interface IMessageReceived {
     author: string,
     text?: string,
-    type: string,
+    type: messageType,
     media?: Buffer | string,
-    isGroup: boolean
+    isGroup: boolean,
+    messageId: string,
 }

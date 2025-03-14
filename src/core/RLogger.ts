@@ -8,19 +8,23 @@ export class RLogger {
             base: { class: className },
             transport: {
                 target: 'pino-pretty'
-              }
+            }
         })
     }
 
     info(message: any): void {
         this.logger.info(JSON.stringify(message))
     }
-    error(message: any):void {
+    error(message: any): void {
         this.logger.error(JSON.stringify(message))
-
     }
-
-    warn(message: string):void {
+    warn(message: string): void {
         this.logger.warn(JSON.stringify(message))
+    }
+    table(info: Map<any, any>, description?: string): void {
+        if (description) {
+            this.logger.info(description)
+        }
+        console.table(info)
     }
 }
