@@ -7,6 +7,10 @@ module.exports = {
     testMatch: [
       '**/tests/**/*.test.ts',
       '**/tests/**/*.spec.ts'
-    ]
+    ],
+    extensionsToTreatAsEsm: ['.ts'],
+    transform: {
+      '^.+\\.ts$': ['ts-jest', { useESM: true }],
+    },
   };
   
