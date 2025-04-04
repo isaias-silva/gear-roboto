@@ -60,6 +60,26 @@ For the commands to be processed, the **Commander** needs to be injected into an
 ```typescript
 const engine = new CommandLineEngine(commander);
 ```
+ #### Importing Commands from a Directory
+ ```typescript
+ commander.addCommandsByPath("path/commands");
+
+ ```
+Now you can automatically import commands from a directory in your project where .ts or .js files export a function implementing the CommanderFunction type.
+
+
+This will load all .ts or .js files in the "commands" folder located in the project's root directory.
+
+#### Example Command File (commands/hello.ts)
+```typescript
+const helloCommand: CommanderFunction = async (engine, author, args) => {
+    engine.send(author, { text: "Hello, world!", type: "text" });
+};
+
+export default helloCommand;
+```
+
+After calling addCommandsByPath("commands"), the command "hello" will be available automatically. 🚀
 
 ---
 
@@ -87,9 +107,9 @@ async monitoring() {
 }
 ```
 
-Principais métodos da **Engine**:
-- `send(to: string, message: IMessageSend)` – Envia mensagens.
-- `monitoring()` – Processa mensagens recebidas.
+methods of **Engine**:
+- `send(to: string, message: IMessageSend)` – send message.
+- `monitoring()` – monitoring messages or other events.
 
 ---
 
