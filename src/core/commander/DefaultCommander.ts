@@ -127,7 +127,7 @@ export class DefaultCommander {
         */
     removePrefix(pfix: string): void {
         if (this.prefixes.includes(pfix)) {
-            this.prefixes.slice(this.prefixes.indexOf(pfix), 1);
+            this.prefixes.splice(this.prefixes.indexOf(pfix), 1);
         }
     }
 
