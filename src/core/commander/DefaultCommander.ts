@@ -44,7 +44,7 @@ export class DefaultCommander {
      * @param dir path in project root folder with commands functions
      */
     addCommandsByPath(dir: string): void {
-        const dirCommand = path.join(__dirname, dir)
+        const dirCommand = path.join(dir)
         const files = fs.readdirSync(dirCommand);
 
         for (const file of files) {
