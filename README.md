@@ -14,7 +14,7 @@ npm install gear-roboto
 import { DefaultChatBot, DefaultCommander, CommandLineEngine, CommandLineTransporter } from "gear-roboto";
 
 async function main() {
-    const commander = new DefaultCommander("!");
+    const commander = new DefaultCommander(["!"]);
     commander.addCommand("hello", (engine, author) => engine.send(author, { text: "world", type: "text" }));
     
     const engine = new CommandLineEngine(commander);
@@ -43,7 +43,7 @@ The library has four main classes:
 The **Commander** is responsible for managing the chatbot's commands. When instantiating it, you define a prefix for the commands:
 
 ```typescript
-const commander = new DefaultCommander("/"); ```
+const commander = new DefaultCommander(["/"]); ```
 
 Add commands with callbacks:
 
