@@ -1,6 +1,6 @@
 {
   "name": "gear-roboto",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "a framework to facilitate the creation of chatbots",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
