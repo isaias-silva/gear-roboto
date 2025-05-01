@@ -138,6 +138,14 @@ chatbot.send("you", { type: "text", text: "Enter a command starting with !" });
 
 ---
 
+### Examples:
+<ul>
+<li>
+    <a href="https://github.com/isaias-silva/apollousa">Telegram Bot</a>
+</li>
+
+</ul>
+
 ## 📜 License
 
 ISC © isaias-silva
