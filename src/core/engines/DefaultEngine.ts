@@ -3,6 +3,7 @@ import { Gear } from "../Gear";
 import { IMessageConnection } from "../../interfaces/IMessageConnection";
 import { IMessageSend } from "../../interfaces/IMessageSend";
 import { DefaultCommander } from "../commander/DefaultCommander";
+import { DefaultFlow } from "../flows/DefaultFlow";
 
 
 /**
@@ -40,7 +41,7 @@ export class DefaultEngine extends Gear {
      */
     async connect(args: string[]): Promise<void> {
 
-       
+
         const [id] = args
 
         this.status = 'connected'
@@ -52,7 +53,7 @@ export class DefaultEngine extends Gear {
         this.getEmitter().emit('g.conn', { status: this.status, adInfo })
 
         this.monitoring();
-       
+
 
     }
 
@@ -87,6 +88,12 @@ export class DefaultEngine extends Gear {
     async send(to: string, message: IMessageSend): Promise<void> { }
 
 
+    async startFlowInEngine(to: string, flow: DefaultFlow) {
+
+        flow.getEmitter().on("g.flow", (to, msg) => this.send(to,msg));
+        flow.start(to, this.getEmitter());
+
+    }
 
     /**
      * observer engine events
