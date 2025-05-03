@@ -10,7 +10,7 @@ import { RLogger } from "./RLogger";
  */
 export class Gear {
     /** Indicates whether logging is enabled. */
-    protected eneableLogs: boolean;
+    protected enableLogs: boolean;
 
     protected logger: RLogger;
     /** Instance of the event emitter for managing gear-related events. */
@@ -19,11 +19,12 @@ export class Gear {
 
     /**
      * Creates a new instance of `Gear`.
-     * @param {boolean} [eneableLogs=false] - Optional flag to enable or disable logging.
+     * @param {boolean} [enableLogs=false] - Optional flag to enable or disable logging.
      */
-    constructor(eneableLogs?: boolean) {
+    constructor(enableLogs?: boolean) {
+       
         this.ev = new EventGearEmitter();
-        this.eneableLogs = eneableLogs || false;
+        this.enableLogs = enableLogs || false;
         this.logger = new RLogger(this.constructor.name)
 
     }

@@ -82,6 +82,24 @@ export class DefaultChatBot<E extends DefaultEngine, T extends DefaultTransporte
     }
 
     /**
+     * Start flow Messages
+     *  @async
+     * @param {string} to chat where the flow will start.
+     * @param {DefaultFlow} flow flow that will be executed.
+     * @returns {Promise<void>}
+     */
+    async startFlow(to: string, flow: DefaultFlow): Promise<void> {
+       
+        if (!flow.inSession(to)) {
+        
+            flow.getEmitter().on("g.flow.msg", (to, msg) => this.send(to, msg));
+            flow.getEmitter().on("g.flow.end", (msg) => this.transporter.transportInfoFlow(msg))
+          
+            flow.start(to, this.engine.getEmitter());
+        }
+      
+    }
+    /**
      * Observes engine events and delegates them to the transporter.
      * 
      * @private
@@ -90,9 +108,10 @@ export class DefaultChatBot<E extends DefaultEngine, T extends DefaultTransporte
      */
 
 
+
     private async observer(): Promise<void> {
         this.engine.getEmitter().on("g.conn", (msg) => this.transporter.transportInfoConn(msg));
         this.engine.getEmitter().on("g.msg", (msg) => this.transporter.transportInfoMsg(msg));
-       
+
     }
 }

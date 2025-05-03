@@ -6,7 +6,7 @@ export class DefaultMessageFlow {
     private id: string;
     private nextid?: string;
 
-    constructor(private message: IMessageSend) {
+    constructor(private messages: IMessageSend[]) {
         this.id = uuidv4()
     }
 
@@ -14,8 +14,8 @@ export class DefaultMessageFlow {
         return this.id;
     }
 
-    getMessage() {
-        return this.message;
+    getMessages() {
+        return this.messages;
     }
 
     getResponse() {

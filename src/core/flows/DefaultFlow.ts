@@ -1,63 +1,157 @@
-import { IMessageSend } from "../../interfaces";
+import { IMessageReceived, IMessageSend } from "../../interfaces";
 import { EventGearEmitter } from "../EventGearEmitter";
 import { Gear } from "../Gear";
 import { DefaultMessageFlow } from "./DefaultMessageFlow";
 
+/**
+ * DefaultFlow manages a message-based conversation flow,
+ * emitting events and handling active chat sessions.
+ */
 export class DefaultFlow extends Gear {
 
-    private messages: Map<string, DefaultMessageFlow> = new Map()
-    private sessions: string[] = []
+    /**
+     * Map of message flows, indexed by ID.
+     */
+    private messages: Map<string, DefaultMessageFlow> = new Map();
 
-    addMessage(message: DefaultMessageFlow) {
+    /**
+     * Active sessions mapped by chatId to their respective listeners.
+     */
+    private sessions: Map<string, (msg: IMessageReceived) => void> = new Map();
 
-        this.messages.set(message.getId(), message);
+    /**
+    * first void message of flow.
+    */
+    private firstMessage?: IMessageSend | undefined;
 
+
+    /**
+    * last of flow.
+    */
+    private lastMessage?: IMessageSend
+
+
+    getFirstMessage(): IMessageSend | undefined {
+        return this.firstMessage;
     }
-    start(chatId: string, engineEmitter: EventGearEmitter) {
 
-        if (this.sessions.find((v) => v == chatId)) {
-            return
+    setFirstMessage(value: IMessageSend | undefined) {
+        this.firstMessage = value;
+    }
+    getLastMessage(): IMessageSend | undefined {
+        return this.lastMessage;
+    }
+    setLastMessage(value: IMessageSend | undefined) {
+        this.lastMessage = value;
+    }
+
+    /**
+     * Adds a message flow step to the flow sequence.
+     * @param message - The message flow step to add.
+     */
+    addMessage(message: DefaultMessageFlow): void {
+        this.messages.set(message.getId(), message);
+    }
+
+    /**
+     * Checks whether a session is currently active for the given chatId.
+     * @param chatId - The ID of the chat.
+     * @returns `true` if a session is active, otherwise `false`.
+     */
+    inSession(chatId: string): boolean {
+        return this.sessions.has(chatId);
+    }
+
+    /**
+     * Starts the flow for a specific chatId.
+     * Listens for incoming messages and progresses through the message flow.
+     * @param chatId - The chat identifier.
+     * @param engineEmitter - The global event emitter that emits received messages.
+     */
+    start(chatId: string, engineEmitter: EventGearEmitter): void {
+
+        if (this.enableLogs) {
+            this.logger.info(`start flow with ${chatId}`);
         }
 
-        this.sessions.push(chatId);
+        let [messageNowId, messageNow] = Array.from(this.messages)[0];
 
-        let [messageNowId, messageNow] = Array.from(this.messages)[0]
+        if (!messageNow) return;
 
-        if (!messageNow) {
-            return
+        if (this.firstMessage) {
+            this.getEmitter().emit("g.flow.msg", chatId, this.firstMessage)
         }
-
-
-        engineEmitter.on("g.msg", (msg) => {
-
-            if (msg.author == chatId || msg.author.includes(chatId)) {
-
-                this.messages.get(messageNowId)?.setResponse(msg)
-                let nextId = this.messages.get(messageNowId)?.getNextId()
+        const listener = (msg: IMessageReceived) => {
+            if ((msg.author === chatId || msg.author.includes(chatId)) && !msg.isMe) {
+                console.log(this.sessions);
+                this.messages.get(messageNowId)?.setResponse(msg);
+                const nextId = this.messages.get(messageNowId)?.getNextId();
 
                 if (nextId) {
-                    messageNowId = nextId
-                    let nextMesage = this.messages.get(nextId)
+                    messageNowId = nextId;
+                    const nextMessage = this.messages.get(nextId);
 
-                    if (nextMesage) {
-                        this.getEmitter().emit("g.flow", chatId, nextMesage.getMessage())
-
-                        messageNow = nextMesage;
+                    if (nextMessage) {
+                        nextMessage.getMessages().forEach((msg) =>
+                            this.getEmitter().emit("g.flow.msg", chatId, msg)
+                        );
+                        messageNow = nextMessage;
                     }
                 } else {
-                    for (let msg of this.messages) {
-                    
-                        console.log({ question: msg[1].getMessage().text, answer: msg[1].getResponse()?.text });
-                       
+                    if (this.lastMessage) {
+                        if (this.firstMessage) {
+                            this.getEmitter().emit("g.flow.msg", chatId, this.lastMessage)
+                        }
                     }
-                    this.closeEmitter()
+                    this.end(chatId, engineEmitter);
                 }
-
             }
-        })
+        };
 
-        this.getEmitter().emit("g.flow", chatId, messageNow.getMessage())
+        this.sessions.set(chatId, listener);
+
+        engineEmitter.on("g.msg", listener);
+
+        messageNow.getMessages().forEach((msg) =>
+            this.getEmitter().emit("g.flow.msg", chatId, msg)
+        );
     }
 
-}
+    /**
+     * Stops the flow session for the specified chatId.
+     * Removes the message listener and clears session data.
+     * @param chatId - The chat identifier.
+     * @param engineEmitter - The global event emitter.
+     */
+    stop(chatId: string, engineEmitter: EventGearEmitter): void {
+        const listener = this.sessions.get(chatId);
 
+        if (listener) {
+            engineEmitter.removeListener("g.msg", listener);
+            this.sessions.delete(chatId);
+        }
+    }
+
+    /**
+     * Ends the session completely, emits a "flow end" event,
+     * and shuts down the emitter if no sessions remain.
+     * @param chatId - The chat identifier.
+     * @param engineEmitter - The global event emitter.
+     */
+    private end(chatId: string, engineEmitter: EventGearEmitter): void {
+        if (this.enableLogs) {
+            this.logger.info(`end session ${chatId}`);
+        }
+
+        this.getEmitter().emit("g.flow.end", {
+            chatId,
+            messages: this.messages
+        });
+
+        this.stop(chatId, engineEmitter);
+
+        if (this.sessions.size === 0) {
+            this.closeEmitter();
+        }
+    }
+}
