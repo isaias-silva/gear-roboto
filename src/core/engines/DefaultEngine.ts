@@ -3,6 +3,7 @@ import { Gear } from "../Gear";
 import { IMessageConnection } from "../../interfaces/IMessageConnection";
 import { IMessageSend } from "../../interfaces/IMessageSend";
 import { DefaultCommander } from "../commander/DefaultCommander";
+import { DefaultFlow } from "../flows/DefaultFlow";
 
 
 /**
@@ -13,7 +14,7 @@ import { DefaultCommander } from "../commander/DefaultCommander";
  * @typedef {DefaultEngine}
  * @extends {Gear}
  */
-export class DefaultEngine extends Gear {
+export abstract class DefaultEngine extends Gear {
 
     protected commander?: DefaultCommander;
 
@@ -22,8 +23,8 @@ export class DefaultEngine extends Gear {
     * 
     * @param {DefaultCommander} cm - The optional commander.
     */
-    constructor(cm?: DefaultCommander) {
-        super()
+    constructor(enableLogs?: boolean, cm?: DefaultCommander) {
+        super(enableLogs)
         this.commander = cm
     }
 
@@ -40,7 +41,7 @@ export class DefaultEngine extends Gear {
      */
     async connect(args: string[]): Promise<void> {
 
-       
+
         const [id] = args
 
         this.status = 'connected'
@@ -52,7 +53,7 @@ export class DefaultEngine extends Gear {
         this.getEmitter().emit('g.conn', { status: this.status, adInfo })
 
         this.monitoring();
-       
+
 
     }
 
@@ -86,7 +87,22 @@ export class DefaultEngine extends Gear {
      */
     async send(to: string, message: IMessageSend): Promise<void> { }
 
+    /**
+     * Start flow Messages
+     *  @async
+     * @param {string} to chat where the flow will start.
+     * @param {DefaultFlow} flow flow that will be executed.
+     * @returns {Promise<void>}
+     */
 
+    async startFlowInEngine(to: string, flow: DefaultFlow): Promise<void> {
+        if (!flow.inSession(to)) {
+            flow.getEmitter().on("g.flow.msg", (to, msg) => this.send(to, msg));
+            flow.getEmitter().on("g.flow", (msg) => this.getEmitter().emit("g.flow", msg));
+            flow.start(to, this.getEmitter());
+        }
+
+    }
 
     /**
      * observer engine events

@@ -43,11 +43,8 @@ The library has four main classes:
 The **Commander** is responsible for managing the chatbot's commands. When instantiating it, you define a prefix for the commands:
 
 ```typescript
-const commander = new DefaultCommander(["/"]); ```
+const commander = new DefaultCommander(["/"]);
 
-Add commands with callbacks:
-
-```typescript
 commander.addCommand("hello", (engine, author, args) => {
 engine.send(author, { text: "world", type: "text" });
 });

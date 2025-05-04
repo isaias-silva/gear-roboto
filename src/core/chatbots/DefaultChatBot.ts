@@ -1,5 +1,6 @@
 import { IMessageSend } from "../../interfaces/IMessageSend";
 import { DefaultEngine } from "../engines/DefaultEngine";
+import { DefaultFlow } from "../flows/DefaultFlow";
 import { DefaultTransporter } from "../transporters/DefaultTransporter";
 import { v4 as uuidv4 } from 'uuid';
 
@@ -54,7 +55,7 @@ export class DefaultChatBot<E extends DefaultEngine, T extends DefaultTransporte
      * @returns {Promise<void>} Resolves when the message is sent.
      */
     async send(to: string, message: IMessageSend): Promise<void> {
-        this.engine.send(to, message);
+        await this.engine.send(to, message);
     }
 
     /**
@@ -63,6 +64,7 @@ export class DefaultChatBot<E extends DefaultEngine, T extends DefaultTransporte
      * @async
      * @returns {Promise<void>} Resolves when the initialization is complete.
      */
+
     async init(): Promise<void> {
         await this.observer();
         this.engine.connect([this.id]);
@@ -75,10 +77,20 @@ export class DefaultChatBot<E extends DefaultEngine, T extends DefaultTransporte
     * @returns {Promise<void>} Resolves when the chatbot disconnect.
     */
     async end(): Promise<void> {
-        this.engine.disconnect([this.id]);
+        await this.engine.disconnect([this.id]);
         this.transporter.closeEmitter()
     }
 
+    /**
+     * Start flow Messages
+     *  @async
+     * @param {string} to chat where the flow will start.
+     * @param {DefaultFlow} flow flow that will be executed.
+     * @returns {Promise<void>}
+     */
+    async startFlow(to: string, flow: DefaultFlow): Promise<void> {
+        await this.engine.startFlowInEngine(to, flow)
+    }
     /**
      * Observes engine events and delegates them to the transporter.
      * 
@@ -87,8 +99,12 @@ export class DefaultChatBot<E extends DefaultEngine, T extends DefaultTransporte
      * @returns {Promise<void>} Resolves when the observer is set up.
      */
 
+
+
     private async observer(): Promise<void> {
         this.engine.getEmitter().on("g.conn", (msg) => this.transporter.transportInfoConn(msg));
         this.engine.getEmitter().on("g.msg", (msg) => this.transporter.transportInfoMsg(msg));
+        this.engine.getEmitter().on("g.flow", (msg) => this.transporter.transportInfoFlow(msg))
+
     }
 }
