@@ -12,7 +12,7 @@ import { IFlowResponse } from "../../interfaces/IFlowResponse";
  * A transporter class responsible for logging connection and message information.
  * Extends the `Gear` class.
  */
-export class DefaultTransporter extends Gear {
+export abstract class DefaultTransporter extends Gear {
     /**
      * Logs connection information if logging is enabled.
      * @param {IMessageConnection} msg - The message containing connection information.

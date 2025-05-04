@@ -25,7 +25,6 @@ export class OptionMessageFlow extends DefaultMessageFlow {
 
         if(this.messages.includes(this.errorInOptionMessage)){
             this.messages.splice(0,1)
-            console.log(this.messages)
         }
 
 

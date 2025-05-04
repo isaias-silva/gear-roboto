@@ -54,6 +54,14 @@ export class DefaultFlow extends Gear {
     }
 
     /**
+    * remove a message flow step to the flow sequence.
+    * @param id - The message flow id.
+    */
+    removeMessage(messageId: string): void {
+        this.messages.delete(messageId)
+    }
+
+    /**
      * Checks whether a session is currently active for the given chatId.
      * @param chatId - The ID of the chat.
      * @returns `true` if a session is active, otherwise `false`.
@@ -74,16 +82,19 @@ export class DefaultFlow extends Gear {
             this.logger.info(`start flow with ${chatId}`);
         }
 
+        if (this.messages.size === 0) {
+            throw new Error("No messages available");
+        }
+
         let [messageNowId, messageNow] = Array.from(this.messages)[0];
 
-        if (!messageNow) return;
 
         if (this.firstMessage) {
             this.getEmitter().emit("g.flow.msg", chatId, this.firstMessage)
         }
         const listener = (msg: IMessageReceived) => {
             if ((msg.author === chatId || msg.author.includes(chatId)) && !msg.isMe) {
-              
+
                 this.messages.get(messageNowId)?.setResponse(msg);
                 const nextId = this.messages.get(messageNowId)?.getnextId();
 
