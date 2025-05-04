@@ -15,13 +15,16 @@ export * from './types'
 async function main() {
 
 
-    const engine = new CommandLineEngine();
     const transporter = new CommandLineTransporter();
+    const commander = new DefaultCommander(["!"])
+
+    const engine = new CommandLineEngine(false, commander);
+
 
     const flow = new DefaultFlow();
 
 
-    const askToStart = new KeyWordMessageFlow([
+    const askToStart = new KeyWordMessageFlow("cadastrar",[
 
         {
             type: "text",
@@ -29,17 +32,18 @@ async function main() {
         }], ["sim", "gostaria", "claro"]);
 
 
-    const notInterested = new DefaultMessageFlow([{
+    const notInterested = new DefaultMessageFlow("motivo_nao_cadastro",[{
         type: "text",
         text: "ok, poderia me dizer porque?"
     }]);
 
     const questions = [
-        "nome",
-        "idade",
-        "curso"
+        {title:"nome", quest:"qual o nome?"},
+        {title:"idade", quest:"qual idade?"},
+        {title:"curso", quest:"qual o curso?"},
+    
 
-    ].map(q => new DefaultMessageFlow([{ type: "text", text: q }]));
+    ].map(q => new DefaultMessageFlow(q.title,[{ type: "text", text: q.quest }]));
 
 
     askToStart.setNextErrorId(notInterested.getId());
@@ -47,7 +51,7 @@ async function main() {
 
     flow.setFirstMessage({ text: "olá tudo bem?", type: "text" })
     flow.setLastMessage({ text: "agradecemos as respostas", type: "text" })
-    
+
     flow.addMessage(askToStart);
     flow.addMessage(notInterested);
 
@@ -63,14 +67,15 @@ async function main() {
     }
 
 
+    commander.addCommand("aluno", async (e, a, b, m) => { e.startFlowInEngine(a, flow) })
 
     const chatbot = new DefaultChatBot(engine, transporter);
 
 
     await chatbot.init();
+    chatbot.send("you", { type: "text", text: "digite um comando:" } )
 
 
-    chatbot.startFlow("you", flow)
 
 
 

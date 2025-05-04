@@ -5,8 +5,8 @@ export class KeyWordMessageFlow extends DefaultMessageFlow {
 
     private nextErrorId?: string;
 
-    constructor(message: IMessageSend[], private keywords: string[]) {
-        super(message)
+    constructor(name: string, message: IMessageSend[], private keywords: string[]) {
+        super(name, message)
     }
 
     setResponse(r: IMessageReceived): void {
@@ -17,7 +17,7 @@ export class KeyWordMessageFlow extends DefaultMessageFlow {
         if (text) {
             for (const word of this.keywords) {
                 const regex = this.createRegex(word);
-                if (regex.test(text)) {            
+                if (regex.test(text)) {
                     responseMatch = true;
                     break
                 }

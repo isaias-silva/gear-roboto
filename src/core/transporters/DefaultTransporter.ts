@@ -6,7 +6,7 @@ import { Gear } from "../Gear";
 import { IMessageConnection } from "../../interfaces/IMessageConnection";
 import { IMessageReceived } from "../../interfaces/IMessageReceived";
 import { DefaultMessageFlow } from "../flows/DefaultMessageFlow";
-import { IFlowEnd } from "../../interfaces/IFlowEnd";
+import { IFlowResponse } from "../../interfaces/IFlowResponse";
 
 /**
  * A transporter class responsible for logging connection and message information.
@@ -50,9 +50,9 @@ export class DefaultTransporter extends Gear {
 
     /**
      * treat msg object
-     * @param {IFlowEnd} msg - The message containing details of the flow.
+     * @param {IFlowResponse} msg - The message containing details of the flow.
      */
-    protected treatInfoFlow(msg: IFlowEnd) {
+    protected treatInfoFlow(msg: IFlowResponse) {
 
     }
 

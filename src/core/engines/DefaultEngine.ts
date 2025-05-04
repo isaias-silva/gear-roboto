@@ -14,7 +14,7 @@ import { DefaultFlow } from "../flows/DefaultFlow";
  * @typedef {DefaultEngine}
  * @extends {Gear}
  */
-export class DefaultEngine extends Gear {
+export abstract class DefaultEngine extends Gear {
 
     protected commander?: DefaultCommander;
 
@@ -98,6 +98,7 @@ export class DefaultEngine extends Gear {
     async startFlowInEngine(to: string, flow: DefaultFlow): Promise<void> {
         if (!flow.inSession(to)) {
             flow.getEmitter().on("g.flow.msg", (to, msg) => this.send(to, msg));
+            flow.getEmitter().on("g.flow", (msg) => this.getEmitter().emit("g.flow", msg));
             flow.start(to, this.getEmitter());
         }
 

@@ -83,7 +83,7 @@ export class DefaultFlow extends Gear {
         }
         const listener = (msg: IMessageReceived) => {
             if ((msg.author === chatId || msg.author.includes(chatId)) && !msg.isMe) {
-                console.log(this.sessions);
+              
                 this.messages.get(messageNowId)?.setResponse(msg);
                 const nextId = this.messages.get(messageNowId)?.getNextId();
 
@@ -143,7 +143,7 @@ export class DefaultFlow extends Gear {
             this.logger.info(`end session ${chatId}`);
         }
 
-        this.getEmitter().emit("g.flow.end", {
+        this.getEmitter().emit("g.flow", {
             chatId,
             messages: this.messages
         });

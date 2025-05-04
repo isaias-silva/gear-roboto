@@ -55,7 +55,7 @@ export class DefaultChatBot<E extends DefaultEngine, T extends DefaultTransporte
      * @returns {Promise<void>} Resolves when the message is sent.
      */
     async send(to: string, message: IMessageSend): Promise<void> {
-        this.engine.send(to, message);
+        await this.engine.send(to, message);
     }
 
     /**
@@ -77,7 +77,7 @@ export class DefaultChatBot<E extends DefaultEngine, T extends DefaultTransporte
     * @returns {Promise<void>} Resolves when the chatbot disconnect.
     */
     async end(): Promise<void> {
-        this.engine.disconnect([this.id]);
+        await this.engine.disconnect([this.id]);
         this.transporter.closeEmitter()
     }
 
@@ -89,15 +89,7 @@ export class DefaultChatBot<E extends DefaultEngine, T extends DefaultTransporte
      * @returns {Promise<void>}
      */
     async startFlow(to: string, flow: DefaultFlow): Promise<void> {
-       
-        if (!flow.inSession(to)) {
-        
-            flow.getEmitter().on("g.flow.msg", (to, msg) => this.send(to, msg));
-            flow.getEmitter().on("g.flow.end", (msg) => this.transporter.transportInfoFlow(msg))
-          
-            flow.start(to, this.engine.getEmitter());
-        }
-      
+        await this.engine.startFlowInEngine(to, flow)
     }
     /**
      * Observes engine events and delegates them to the transporter.
@@ -112,6 +104,7 @@ export class DefaultChatBot<E extends DefaultEngine, T extends DefaultTransporte
     private async observer(): Promise<void> {
         this.engine.getEmitter().on("g.conn", (msg) => this.transporter.transportInfoConn(msg));
         this.engine.getEmitter().on("g.msg", (msg) => this.transporter.transportInfoMsg(msg));
+        this.engine.getEmitter().on("g.flow", (msg) => this.transporter.transportInfoFlow(msg))
 
     }
 }
