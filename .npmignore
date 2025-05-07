@@ -1,6 +1,8 @@
 node_modules
+src/
 .git
 src/tests
 build/tests
 .env
 jest.config.js
+.github
