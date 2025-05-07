@@ -53,7 +53,7 @@ describe("test flow", () => {
         const { step1, step2 } = buildDefaultFlow()
 
 
-        step1.setnextId(step2.getId());
+        step1.setNextId(step2.getId());
 
         flow.addMessage(step1);
         flow.addMessage(step2);
@@ -108,7 +108,7 @@ describe("test flow", () => {
 
         const { step1, step2 } = buildDefaultFlow()
 
-        step1.setnextId(step2.getId());
+        step1.setNextId(step2.getId());
 
         flow.addMessage(step1);
         flow.addMessage(step2);

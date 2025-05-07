@@ -42,11 +42,11 @@ export class OptionMessageFlow extends DefaultMessageFlow {
         }
 
     }
-    getnextId(): string | undefined {
+    getNextId(): string | undefined {
         if (this.selectedOption) {
             return this.selectedOption.nextId;
         }
-        return super.getnextId()
+        return super.getNextId()
 
     }
 

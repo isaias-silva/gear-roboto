@@ -31,10 +31,10 @@ export class DefaultMessageFlow {
     setResponse(r: IMessageReceived) {
         this.response = r;
     }
-    getnextId() {
+    getNextId() {
         return this.erroInResponse ? this.nextErrorId : this.nextId;
     }
-    setnextId(next: string) {
+    setNextId(next: string) {
         this.nextId = next
     }
 
