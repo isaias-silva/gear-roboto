@@ -1,6 +1,8 @@
 {
   "name": "gear-roboto",
+
   "version": "1.2.5",
+
 
   "description": "a framework to facilitate the creation of chatbots",
   "scripts": {
