@@ -2,24 +2,27 @@
   "name": "gear-roboto",
   "version": "1.2.1",
   "description": "a framework to facilitate the creation of chatbots",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "scripts": {
     "start": "node index.js",
     "dev": "ts-node-dev ./src/index.ts test",
-    "build":"tsc",
+    "build": "tsup",
     "test": "jest"
   },
-  "keywords": ["chatbot","automation" ,"typescript", "node"],
+  "keywords": [
+    "chatbot",
+    "automation",
+    "typescript",
+    "node"
+  ],
   "author": "zack",
   "license": "ISC",
-  
   "devDependencies": {
     "@types/jest": "^29.5.14",
     "@types/node": "^22.10.2",
     "jest": "^29.7.0",
     "ts-jest": "^29.2.5",
     "ts-node-dev": "^2.0.0",
+    "tsup": "^8.4.0",
     "typescript": "^5.7.2"
   },
   "dependencies": {
@@ -27,9 +30,15 @@
     "pino-pretty": "^13.0.0",
     "uuid": "^11.0.3"
   },
-  "files": [
-    "dist"
-  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.mjs"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/isaias-silva/gear-roboto"
