@@ -5,6 +5,7 @@
 import path from "path";
 import * as fs from "fs";
 import { CommanderFunction } from "../../interfaces/CommanderFunction";
+import { CommandLineEngine, DefaultEngine } from "../engines";
 /**
  * Class responsible for managing prefix-based commands.
  */
@@ -37,6 +38,7 @@ export class DefaultCommander {
      * @param {CommanderFunction} fn - The function associated with the command.
      */
     addCommand(word: string, fn: CommanderFunction): void {
+
         this.commands.set(word, fn);
     }
     /**
@@ -51,11 +53,15 @@ export class DefaultCommander {
         for (const file of files) {
             if (!file.endsWith('.js') && !file.endsWith('.ts')) continue;
 
-            const command: { default: CommanderFunction } = await import(path.join(dirCommand, file));
+            const fn = await import(path.join(dirCommand, file));
 
-            if (command.default && typeof command.default === 'function') {
+            let command = fn;
+            while (command?.default) {
+                command = command.default;
+            }
 
-                this.addCommand(command.default.name, command.default)
+            if (this.isCommanderFunction(command)) {
+                this.addCommand(command.name, command);
             }
         }
     }
@@ -136,6 +142,11 @@ export class DefaultCommander {
 
     private isValidPrefix(pfix: string): boolean {
         return pfix.length == 1;
+
+    }
+    private isCommanderFunction(fn: Function): boolean {
+
+        return (fn && typeof fn === "function" && fn.length >= 2)
 
     }
 }
