@@ -1,6 +1,7 @@
 {
   "name": "gear-roboto",
   "version": "1.2.3",
+
   "description": "a framework to facilitate the creation of chatbots",
   "scripts": {
     "start": "node ./dist/index.js",
@@ -30,7 +31,9 @@
     "pino-pretty": "^13.0.0",
     "uuid": "^11.0.3"
   },
+
   "main": "./dist/index.js",
+
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
