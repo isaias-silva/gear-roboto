@@ -96,7 +96,7 @@ export class DefaultFlow extends Gear {
             if ((msg.author === chatId || msg.author.includes(chatId)) && !msg.isMe) {
 
                 this.messages.get(messageNowId)?.setResponse(msg);
-                const nextId = this.messages.get(messageNowId)?.getnextId();
+                const nextId = this.messages.get(messageNowId)?.getNextId();
 
                 if (nextId) {
                     messageNowId = nextId;
