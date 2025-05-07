@@ -42,15 +42,16 @@ export class DefaultCommander {
     /**
      * automates adding commands via directory
      * @param dir path in project root folder with commands functions
+     * @async
      */
-    addCommandsByPath(dir: string): void {
+    async addCommandsByPath(dir: string): Promise<void> {
         const dirCommand = path.join(dir)
         const files = fs.readdirSync(dirCommand);
 
         for (const file of files) {
             if (!file.endsWith('.js') && !file.endsWith('.ts')) continue;
 
-            const command: { default: CommanderFunction } = require(path.join(dirCommand, file));
+            const command: { default: CommanderFunction } = await import(path.join(dirCommand, file));
 
             if (command.default && typeof command.default === 'function') {
 

@@ -24,7 +24,8 @@ describe("test default commander", () => {
 
     test("add commands by path", async () => {
         const commandPath = __dirname + path.join("..", "..", "tests", "mockfiles", 'commands')
-        commander.addCommandsByPath(commandPath)
+        await commander.addCommandsByPath(commandPath)
+        
         expect(commander.searchCommand('hello')).toBeDefined()
         expect(commander.searchCommand('ping')).toBeDefined()
     })
