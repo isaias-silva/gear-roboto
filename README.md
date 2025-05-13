@@ -7,7 +7,7 @@
 ## 🚀 Installation
 
 ```sh
-npm install gear-roboto-core
+npm install gear-roboto
 ```
 
 ## 🔥 Usage Example
