@@ -1,1 +1,1 @@
-export type messageType = "text" | "image" | "video" | "document" | "file" | "audio" | "sticker" | "menu"
+export type messageType = "text" | "image" | "video" | "document" | "file" | "audio" | "sticker"

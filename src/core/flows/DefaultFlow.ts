@@ -31,6 +31,9 @@ export class DefaultFlow extends Gear {
     private lastMessage?: IMessageSend
 
 
+    getMessagesFlow(): Map<string, DefaultMessageFlow> {
+        return this.messages;
+    }
     getFirstMessage(): IMessageSend | undefined {
         return this.firstMessage;
     }
@@ -51,6 +54,14 @@ export class DefaultFlow extends Gear {
      */
     addMessage(message: DefaultMessageFlow): void {
         this.messages.set(message.getId(), message);
+    }
+
+    /**
+    * Adds multiple message flow steps to the flow sequence.
+    * @param messages - group of messages to be added.
+    */
+    addMessages(...messages: DefaultMessageFlow[]): void {
+        messages.forEach((message) => this.messages.set(message.getId(), message))
     }
 
     /**

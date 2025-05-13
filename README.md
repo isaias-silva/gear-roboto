@@ -1,11 +1,11 @@
-# gear-roboto
+# gear-roboto-core
 
-**gear-roboto** is a mini framework for creating and organizing chatbot logic, allowing message transport and event monitoring.
+**gear-roboto-core** is a mini framework for creating and organizing chatbot logic, allowing message transport message flow and event monitoring.
 
 ## 🚀 Installation
 
 ```sh
-npm install gear-roboto
+npm install gear-roboto-core
 ```
 
 ## 🔥 Usage Example
@@ -33,10 +33,11 @@ main();
 
 The library has four main classes:
 
-1. **Commander** – Manages the chatbot's commands.
-2. **Engine** – Controls external interactions.
-3. **Transporter** – Manages the transport of messages and events.
-4. **Chatbot** – Provides communication between the Engine and Transporter.
+1. **[Commander](#-commander-command-manager)** – Manages the chatbot's commands.
+2. **[Engine](#-engine-interaction-manager)** – Controls external interactions.
+3. **[Transporter](#-transporter-message-transporter)** – Manages the transport of messages and events.
+4. **[Chatbot](#-transporter-message-transporter)** – Provides communication between the Engine and Transporter.
+5. **[flow](#-message-flow)** – responsible for defining a conversation flow
 
 ### 🎯 Commander (Command Manager)
 
@@ -128,13 +129,139 @@ The **Chatbot** class connects the **Engine** to the **Transporter** and allows 
 
 
 ```typescript 
-const chatbot = new DefaultChatBot(engine, transporter);
+const chatbot = new CommandLineChatBot(engine, transporter);
 await chatbot.init();
 chatbot.send("you", { type: "text", text: "Enter a command starting with !" });
  ```
 
 ---
+### 🔀 Message flow
+Flows are responsible for emulating a conversation with the chatbot without relying on commands and also serve to store responses.<br>
+The class responsible for managing a flow is ```DefaultFlow```, the main methods of this class are:
 
+- `start`: start a flow.
+- `addMessage`: add Message in a flow.
+- `setFirstMessage`: define the first message of a flow.
+- `setLastMessage`: define the last message of a flow.
+- `getLastMessage`: return the last message of a flow.
+- `getFirstMessage`: return the first message of a flow.
+- `removeMessage`: remove a message by id.
+
+#### 🎯 flow messages:
+Structures that store and process responses have a special class, we use `DefaultMessageFlow` and its child classes.<br>
+DefaultMessageFlow receives an array of `IMessageSend` that will be sent in sequence, the class and its children have a **linked list logic**, each object of the class has an id and a nextId of another object of the same class, the latter being able to be null, which would end the flow.
+
+```typescript
+const flow = new DefaultFlow();
+
+const nameMessage = new DefaultMessageFlow("YOUR_NAME", [{ type: "text", text: "what's your name?" }]); //define message
+const ageMessage = new DefaultMessageFlow("YOUR_AGE", [{type:"text",text:"great!"},{ type: "text", text: "how old are you?" }]);
+
+nameMessage.setNextId(ageMessage.getId()) //set next message by id
+
+flow.addMessage(nameMessage)
+flow.addMessage(ageMessage)
+
+flow.start()
+```
+
+So far there are 3 types of MessageFlow:
+
+| Class                | description                                                                                                                                                                                                          |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DefaultMessageFlow` | basic class, just stores the response                                                                                                                                                                                |
+| `KeyWordMessageFlow` | compares whether the response has any of the keywords, if yes, it points to the next message, if no, it points to the error message or ends the flow if it is the last message                                       |
+| `OptionMessageFlow`  | receives an object with options, the options can be numbers or strings, each option will point to a message of any type, if the response does not satisfy the options, the message is sent again informing the error |
+
+------------------------------------
+
+#### 🧩 practical use of MessageFlow classes
+
+- **DefaultMessageFlow**:
+    ```javascript
+
+    const nameMessage = new DefaultMessageFlow("YOUR_NAME", [{ type: "text", text: "what's your name?" }]);
+    flow.addMessage(nameMessage)
+   
+    ```
+- **KeyWordMessageFlow**:
+    ```typescript
+    
+    //keyword message
+    const isRioPeopleMessage = new KeyWordMessageFlow("IS_RJ_PEOPLE", [{ type: "text", text: "Do you live in Rio de Janeiro?" }],["yes","yeah"]);
+   
+   //If the keywords are found in the response, the next message will be:
+    const bestRestaurantInRioFromMessage = new DefaultMessageFlow("BEST_RESTAURANT", [{ type: "text", text: "What is the best restaurant in Rio?" }]);
+    isRioPeopleMessage.setNextId(bestRestaurantInRioFromMessage)
+   
+   //otherwise the next message will be:
+    const whereAreYouFromMessage = new DefaultMessageFlow("YOUR_CITY", [{ type: "text", text: "Oh... where are you from?" }]);
+    isRioPeopleMessage.setNextErrorId(whereAreYouFromMessage)
+    
+    flow.addMessage(isRioPeopleMessage)
+    flow.addMessage(bestRestaurantInRioFromMessage)
+    flow.addMessage(whereAreYouFromMessage)
+
+    ```
+- **OptionMessageFlow**:
+    ```typescript
+
+    //define options:
+    const opt1 = new DefaultMessageFlow("1", [{ type: "text", text: "talk about number one:" }]);
+    const opt2 = new DefaultMessageFlow("1", [{ type: "text", text: "talk about number two:" }]);
+    const opt3 = new DefaultMessageFlow("1", [{ type: "text", text: "talk about number three:" }]);
+
+    //define menu
+    const menu = new OptionMessageFlow(
+        "1",
+        [{ type: "text", text: "choose a number between 1 and 3" }],
+        [
+            { key: 1, nextId: opt1.getId() },
+            { key: 2, nextId: opt2.getId() },
+            { key: 3, nextId: opt3.getId() },
+        ],
+        { text: "invalid option", type: "text" }
+    );
+
+    flow.addMessage(menu)
+    flow.addMessage(opt1)
+    flow.addMessage(opt2)
+    flow.addMessage(opt3)
+   
+    ```
+> the first MessageFlow to be added to the flow is the first one to be sent right after sending the firstMessage
+
+> at the end of the flow, a `g.flow` event will be fired to the transporter.
+
+
+#### 🎯 First and last messages in flow:
+The last and the first messages are objects that implement the interface `IMessageSend` just like in the methods `send` in [Engine](#️-engine-interaction-manager) and [Chatbot](#-chatbot-general-manager). These messages will be sent at the beginning and end of a flow as a "greeting" and a "farewell", they are two optional parameters.
+
+``` typescript
+
+const flow = new DefaultFlow();
+flow.setFirstMessage({type:"text",text:"hello"});
+flow.setLastMessage({type:"text",text:"bye bye"});
+
+```
+> first and last messages don´t store response
+
+#### init a flow in chatbot:
+
+a flow can be initiated directly from the chatbot or by a CommanderFuncion passing through the engine;
+- in chatbot:
+  ```javascript
+ 
+  chatbot.startFlow(to, flow)
+  ```
+- in the engine via commander function:
+  ```javascript
+ 
+   engine.startFlowInEngine(to, flow)
+  ```
+
+
+---
 ### Examples:
 <ul>
 <li>

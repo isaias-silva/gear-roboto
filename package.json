@@ -1,7 +1,7 @@
 {
-  "name": "gear-roboto",
+  "name": "gear-roboto-core",
 
-  "version": "1.2.5",
+  "version": "1.2.6",
 
 
   "description": "a framework to facilitate the creation of chatbots",
@@ -46,6 +46,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/isaias-silva/gear-roboto"
+    "url": "https://github.com/isaias-silva/gear-roboto-core"
   }
 }
