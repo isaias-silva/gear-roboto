@@ -1,4 +1,4 @@
-import { DefaultFlow, DefaultMessageFlow, KeyWordMessageFlow, OptionMessageFlow } from "../core/flows"
+import { DefaultFlow, DefaultMessageFlow } from "../core/flows"
 import { TestEngine } from "./DefaultEngine.test"
 
 describe("test flow", () => {
@@ -17,6 +17,22 @@ describe("test flow", () => {
         process.removeAllListeners("SIGINT");
         process.removeAllListeners("uncaughtException");
     });
+
+    test("should add a message",()=>{
+         const mockMessage = new DefaultMessageFlow("mock", [{ type: "text", text: "hello" }])
+         flow.addMessage(mockMessage);
+         expect(flow.getMessagesFlow().size).toEqual(1)
+    })
+
+     test("should add many messages",()=>{
+       
+        const mockMessage = new DefaultMessageFlow("mock", [{ type: "text", text: "hello" }])
+         const mockMessageTwo = new DefaultMessageFlow("mock", [{ type: "text", text: "hello" }])
+       
+         flow.addMessages(mockMessage,mockMessageTwo);
+        
+         expect(flow.getMessagesFlow().size).toEqual(2)
+    })
 
     test("should start flow message", () => {
         const mockMessage = new DefaultMessageFlow("mock", [{ type: "text", text: "hello" }])
