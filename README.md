@@ -1,11 +1,13 @@
 # gear-roboto
 
+
 **gear-roboto** is a mini framework for creating and organizing chatbot logic, allowing message transport message flow and event monitoring.
+
 
 ## 🚀 Installation
 
 ```sh
-npm install gear-roboto
+npm install gear-roboto-core
 ```
 
 ## 🔥 Usage Example
