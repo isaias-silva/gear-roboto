@@ -46,7 +46,7 @@ describe("test transporter", () => {
 
         transporter.transportInfoFlow({
             chatId: "mock-chatId",
-            messages: new Map()
+            messages: []
         })
 
         expect(spyTreatInfoFlow).toHaveBeenCalled()

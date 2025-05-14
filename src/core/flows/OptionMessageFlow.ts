@@ -10,9 +10,10 @@ export class OptionMessageFlow extends DefaultMessageFlow {
         messages: IMessageSend[],
         private opts: ImenuOptFlow[],
         private errorInOptionMessage: IMessageSend,
+        id?: string
 
     ) {
-        super(name, messages);
+        super(name, messages, id);
         this.setNextErrorId(this.getId())
     }
 
@@ -23,8 +24,8 @@ export class OptionMessageFlow extends DefaultMessageFlow {
         this.erroInResponse = true
         this.selectedOption = undefined
 
-        if(this.messages.includes(this.errorInOptionMessage)){
-            this.messages.splice(0,1)
+        if (this.messages.includes(this.errorInOptionMessage)) {
+            this.messages.splice(0, 1)
         }
 
 
@@ -47,6 +48,16 @@ export class OptionMessageFlow extends DefaultMessageFlow {
             return this.selectedOption.nextId;
         }
         return super.getNextId()
+
+    }
+
+    clone(): DefaultMessageFlow {
+        const clone = new OptionMessageFlow(this.getName(), this.messages, this.opts, this.errorInOptionMessage, this.getId())
+        const nextId = this.getNextId()
+        if (nextId) {
+            clone.setNextId(nextId)
+        }
+        return clone;
 
     }
 

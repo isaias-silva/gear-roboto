@@ -1,4 +1,4 @@
-import { DefaultFlow, DefaultMessageFlow, KeyWordMessageFlow } from "../core/flows";
+import { DefaultFlow, StoreMessageFlow, KeyWordMessageFlow } from "../core/flows";
 import { TestEngine } from "./DefaultEngine.test";
 
 describe("test KeyWordMessageFlow cases", () => {
@@ -59,7 +59,7 @@ describe("test KeyWordMessageFlow cases", () => {
 
         expect(emitSpy).toHaveBeenCalledWith("g.flow", {
             chatId,
-            messages: expect.any(Map)
+            messages: expect.any(Array)
         });
 
 
@@ -111,7 +111,7 @@ describe("test KeyWordMessageFlow cases", () => {
 
         expect(emitSpy).toHaveBeenCalledWith("g.flow", {
             chatId,
-            messages: expect.any(Map)
+            messages: expect.any(Array)
         });
 
         expect(flow.inSession(chatId)).toBe(false);
@@ -122,7 +122,7 @@ describe("test KeyWordMessageFlow cases", () => {
 function buildKeyWordFlow() {
     const step1 = new KeyWordMessageFlow("1", [{ type: "text", text: "go?" }], ["yes", "ok"]);
 
-    const step2 = new DefaultMessageFlow("2", [{ type: "text", text: "whats your name?" }]);
+    const step2 = new StoreMessageFlow("2", [{ type: "text", text: "whats your name?" }]);
 
     return { step1, step2 }
 }
