@@ -3,8 +3,8 @@ import { DefaultMessageFlow } from "./DefaultMessageFlow";
 
 export class KeyWordMessageFlow extends DefaultMessageFlow {
 
-    constructor(name: string, message: IMessageSend[], private keywords: string[]) {
-        super(name, message)
+    constructor(name: string, message: IMessageSend[], private keywords: string[], id?: string) {
+        super(name, message, id)
     }
 
     setResponse(r: IMessageReceived): void {
@@ -27,5 +27,20 @@ export class KeyWordMessageFlow extends DefaultMessageFlow {
 
     private createRegex(word: string) {
         return new RegExp(word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "i");
+    }
+
+
+    clone(): DefaultMessageFlow {
+        const clone = new KeyWordMessageFlow(this.getName(), this.messages, this.keywords);
+        const nextId = this.getNextId()
+
+        if (nextId) clone.setNextId(nextId)
+
+        const nextErrorId = this.getNextErrorId()
+
+        if (nextErrorId) clone.setNextErrorId(nextErrorId)
+
+        return clone;
+
     }
 }

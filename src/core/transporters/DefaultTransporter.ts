@@ -41,7 +41,7 @@ export abstract class DefaultTransporter extends Gear {
   * Logs received message information if logging is enabled.
   * @param {IMessageReceived} msg - The message containing details of the received communication.
   */
-    transportInfoFlow(msg: { chatId: string, messages: Map<String, DefaultMessageFlow> }): void {
+    transportInfoFlow(msg:IFlowResponse): void {
         if (this.enableLogs) {
             this.logger.info(msg);
         }

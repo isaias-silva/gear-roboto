@@ -1,4 +1,4 @@
-import { DefaultFlow, DefaultMessageFlow, OptionMessageFlow } from "../core/flows";
+import { DefaultFlow, StoreMessageFlow, OptionMessageFlow } from "../core/flows";
 import { TestEngine } from "./DefaultEngine.test";
 
 describe("test OptionMessageFlow cases", () => {
@@ -59,7 +59,7 @@ describe("test OptionMessageFlow cases", () => {
 
         expect(emitSpy).toHaveBeenCalledWith("g.flow", {
             chatId,
-            messages: expect.any(Map)
+            messages: expect.any(Array)
         });
 
 
@@ -125,7 +125,7 @@ describe("test OptionMessageFlow cases", () => {
 
         expect(emitSpy).toHaveBeenCalledWith("g.flow", {
             chatId,
-            messages: expect.any(Map)
+            messages: expect.any(Array)
         });
 
 
@@ -136,9 +136,9 @@ describe("test OptionMessageFlow cases", () => {
 })
 
 function buildOptionFlow() {
-    const opt1 = new DefaultMessageFlow("1", [{ type: "text", text: "talk about number one:" }]);
-    const opt2 = new DefaultMessageFlow("1", [{ type: "text", text: "talk about number two?" }]);
-    const opt3 = new DefaultMessageFlow("1", [{ type: "text", text: "talk about number three?" }]);
+    const opt1 = new StoreMessageFlow("1", [{ type: "text", text: "talk about number one:" }]);
+    const opt2 = new StoreMessageFlow("1", [{ type: "text", text: "talk about number two?" }]);
+    const opt3 = new StoreMessageFlow("1", [{ type: "text", text: "talk about number three?" }]);
 
     const step1 = new OptionMessageFlow(
         "1",

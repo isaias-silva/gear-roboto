@@ -1,7 +1,7 @@
 import { IMessageReceived, IMessageSend } from "../../interfaces";
 import { v4 as uuidv4 } from 'uuid';
 
-export class DefaultMessageFlow {
+export abstract class DefaultMessageFlow {
     private id: string;
     protected erroInResponse: boolean = false;
     protected response?: IMessageReceived;
@@ -9,9 +9,10 @@ export class DefaultMessageFlow {
     private nextId?: string;
     private nextErrorId?: string;
 
-    constructor(private name: string, protected messages: IMessageSend[]) {
-        this.id = uuidv4()
+    constructor(private name: string, protected messages: IMessageSend[], id?: string) {
+        this.id = id || uuidv4()
     }
+
 
     getId() {
         return this.id;
@@ -34,11 +35,17 @@ export class DefaultMessageFlow {
     getNextId() {
         return this.erroInResponse ? this.nextErrorId : this.nextId;
     }
+
     setNextId(next: string) {
         this.nextId = next
     }
-
+    
+    getNextErrorId(){
+        return this.nextErrorId;
+    }
     setNextErrorId(id: string) {
         this.nextErrorId = id;
     }
+
+    abstract clone(): DefaultMessageFlow;
 }

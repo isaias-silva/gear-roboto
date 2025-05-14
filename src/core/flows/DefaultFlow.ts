@@ -17,7 +17,7 @@ export class DefaultFlow extends Gear {
     /**
      * Active sessions mapped by chatId to their respective listeners.
      */
-    private sessions: Map<string, (msg: IMessageReceived) => void> = new Map();
+    private sessions: Map<string, { listener: (msg: IMessageReceived) => void, sessionMessages: Map<string, DefaultMessageFlow> }> = new Map();
 
     /**
     * first void message of flow.
@@ -97,7 +97,9 @@ export class DefaultFlow extends Gear {
             throw new Error("No messages available");
         }
 
-        let [messageNowId, messageNow] = Array.from(this.messages)[0];
+        const sessionMessages = this.getSessionMessages()
+
+        let [messageNowId, messageNow] = Array.from(sessionMessages)[0];
 
 
         if (this.firstMessage) {
@@ -106,12 +108,12 @@ export class DefaultFlow extends Gear {
         const listener = (msg: IMessageReceived) => {
             if ((msg.author === chatId || msg.author.includes(chatId)) && !msg.isMe) {
 
-                this.messages.get(messageNowId)?.setResponse(msg);
-                const nextId = this.messages.get(messageNowId)?.getNextId();
+                sessionMessages.get(messageNowId)?.setResponse(msg);
+                const nextId = sessionMessages.get(messageNowId)?.getNextId();
 
                 if (nextId) {
                     messageNowId = nextId;
-                    const nextMessage = this.messages.get(nextId);
+                    const nextMessage = sessionMessages.get(nextId);
 
                     if (nextMessage) {
                         nextMessage.getMessages().forEach((msg) =>
@@ -130,7 +132,7 @@ export class DefaultFlow extends Gear {
             }
         };
 
-        this.sessions.set(chatId, listener);
+        this.sessions.set(chatId, { listener, sessionMessages });
 
         engineEmitter.on("g.msg", listener);
 
@@ -146,34 +148,55 @@ export class DefaultFlow extends Gear {
      * @param engineEmitter - The global event emitter.
      */
     stop(chatId: string, engineEmitter: EventGearEmitter): void {
-        const listener = this.sessions.get(chatId);
+        const session = this.sessions.get(chatId);
 
-        if (listener) {
-            engineEmitter.removeListener("g.msg", listener);
+        if (session) {
+            engineEmitter.removeListener("g.msg", session.listener);
             this.sessions.delete(chatId);
         }
-    }
-
-    /**
-     * Ends the session completely, emits a "flow end" event,
-     * and shuts down the emitter if no sessions remain.
-     * @param chatId - The chat identifier.
-     * @param engineEmitter - The global event emitter.
-     */
-    private end(chatId: string, engineEmitter: EventGearEmitter): void {
-        if (this.enableLogs) {
-            this.logger.info(`end session ${chatId}`);
-        }
-
-        this.getEmitter().emit("g.flow", {
-            chatId,
-            messages: this.messages
-        });
-
-        this.stop(chatId, engineEmitter);
-
         if (this.sessions.size === 0) {
             this.closeEmitter();
         }
     }
+
+    protected getSessionMessages(): Map<string, DefaultMessageFlow> {
+        const cloneMessages: Map<string, DefaultMessageFlow> = new Map();
+
+        this.messages.forEach((v, k) =>
+
+            cloneMessages.set(k, v.clone())
+        )
+
+        return cloneMessages;
+    }
+
+    protected end(chatId: string, engineEmitter: EventGearEmitter): void {
+        if (this.enableLogs) {
+            this.logger.info(`end session ${chatId}`);
+        }
+
+        const session = this.sessions.get(chatId);
+        if (session) {
+            this.getEmitter().emit("g.flow", {
+                chatId,
+                messages: this.getObjectMessages(chatId)
+            });
+
+            this.stop(chatId, engineEmitter);
+
+
+        }
+    }
+
+    protected getObjectMessages(chatId: string) {
+        const session = this.sessions.get(chatId);
+        if (!session) {
+            throw new Error("session not found")
+        }
+        const obj = Object.values(Object.fromEntries(session?.sessionMessages)).filter((m) => m.getResponse() != undefined)
+        
+        return obj
+
+    }
+
 }
