@@ -3,25 +3,9 @@ import { DefaultMessageFlow } from "./DefaultMessageFlow";
 
 export class KeyWordMessageFlow extends DefaultMessageFlow {
 
+
     constructor(name: string, message: IMessageSend[], private keywords: string[], id?: string) {
         super(name, message, id)
-    }
-
-    setResponse(r: IMessageReceived): void {
-
-        const { text } = r;
-        this.response = r;
-        this.erroInResponse = true
-        if (text) {
-            for (const word of this.keywords) {
-                const regex = this.createRegex(word);
-                if (regex.test(text)) {
-                    this.erroInResponse = false;
-                    break
-                }
-            }
-        }
-
     }
 
 
@@ -42,5 +26,24 @@ export class KeyWordMessageFlow extends DefaultMessageFlow {
 
         return clone;
 
+    }
+    protected analyzeResponses(): void {
+        const textOfResponses = this.responses.map(r => r.text)
+      
+        this.erroInResponse = true
+        if (textOfResponses.length > 0) {
+
+            for (const word of this.keywords) {
+                const regex = this.createRegex(word);
+                const match = textOfResponses.find((v) => v && regex.test(v))
+
+                if (match) {
+
+                    this.erroInResponse = false;
+
+                    break
+                }
+            }
+        }
     }
 }

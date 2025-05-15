@@ -17,40 +17,15 @@ export class OptionMessageFlow extends DefaultMessageFlow {
         this.setNextErrorId(this.getId())
     }
 
-    setResponse(r: IMessageReceived): void {
 
-        const { text } = r;
-        this.response = r;
-        this.erroInResponse = true
-        this.selectedOption = undefined
-
-        if (this.messages.includes(this.errorInOptionMessage)) {
-            this.messages.splice(0, 1)
-        }
-
-
-        if (text) {
-            this.opts.forEach((opt) => {
-                if (text.toLowerCase().trim() == opt.key) {
-                    this.erroInResponse = false
-                    this.selectedOption = opt
-                }
-
-            })
-        }
-        if (!this.selectedOption && this.errorInOptionMessage) {
-            this.messages.unshift(this.errorInOptionMessage);
-        }
-
-    }
-    getNextId(): string | undefined {
+    determineNextId(): string | undefined {
+        this.analyzeResponses()
+       
         if (this.selectedOption) {
             return this.selectedOption.nextId;
         }
-        return super.getNextId()
-
+        return this.getNextErrorId()
     }
-
     clone(): DefaultMessageFlow {
         const clone = new OptionMessageFlow(this.getName(), this.messages, this.opts, this.errorInOptionMessage, this.getId())
         const nextId = this.getNextId()
@@ -59,6 +34,34 @@ export class OptionMessageFlow extends DefaultMessageFlow {
         }
         return clone;
 
+    }
+    protected analyzeResponses() {
+
+        const textOfResponses = this.responses.map(r => r.text)
+
+
+        this.erroInResponse = true
+        this.selectedOption = undefined
+
+        if (this.messages.includes(this.errorInOptionMessage)) {
+            this.messages.splice(0, 1)
+        }
+
+        if (textOfResponses.length > 0) {
+            this.opts.forEach((opt) => {
+                if (textOfResponses.find(v => v?.trim().toLowerCase() == opt.key)) {
+                    
+                    this.erroInResponse = false
+                    this.selectedOption = opt
+                }
+
+            })
+        }
+        if (!this.selectedOption && this.errorInOptionMessage) {
+            this.responses.splice(0, this.responses.length - 1)
+            this.messages.unshift(this.errorInOptionMessage);
+        }
+       
     }
 
 }

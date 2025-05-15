@@ -11,4 +11,6 @@ export class StoreMessageFlow extends DefaultMessageFlow {
         return clone;
     }
 
+    protected analyzeResponses(): void { }
+
 }

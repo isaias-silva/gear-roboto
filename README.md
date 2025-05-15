@@ -154,7 +154,7 @@ Structures that store and process responses have a special class, we use `Defaul
 DefaultMessageFlow receives an array of `IMessageSend` that will be sent in sequence, the class and its children have a **linked list logic**, each object of the class has an id and a nextId of another object of the same class, the latter being able to be null, which would end the flow.
 
 ```typescript
-const flow = new DefaultFlow();
+const flow = new DefaultFlow("test-flow");
 
 const nameMessage = new DefaultMessageFlow("YOUR_NAME", [{ type: "text", text: "what's your name?" }]); //define message
 const ageMessage = new DefaultMessageFlow("YOUR_AGE", [{type:"text",text:"great!"},{ type: "text", text: "how old are you?" }]);
@@ -241,7 +241,7 @@ The last and the first messages are objects that implement the interface `IMessa
 
 ``` typescript
 
-const flow = new DefaultFlow();
+const flow = new DefaultFlow("test-flow");
 flow.setFirstMessage({type:"text",text:"hello"});
 flow.setLastMessage({type:"text",text:"bye bye"});
 

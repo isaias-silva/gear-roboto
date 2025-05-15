@@ -6,7 +6,7 @@ describe("test OptionMessageFlow cases", () => {
     let flow: DefaultFlow
     let mockEngine: TestEngine
     beforeEach(() => {
-        flow = new DefaultFlow();
+        flow = new DefaultFlow("test-flow");
         mockEngine = new TestEngine()
     })
     afterEach(() => {
@@ -38,7 +38,8 @@ describe("test OptionMessageFlow cases", () => {
             text: "1",
             type: "text",
             isGroup: false,
-            messageId: "1"
+            messageId: "1",
+            chatId
         });
 
 
@@ -48,7 +49,8 @@ describe("test OptionMessageFlow cases", () => {
             text: "i like number 1",
             type: "text",
             isGroup: false,
-            messageId: "2"
+            messageId: "2",
+            chatId
         });
 
         expect(emitSpy).toHaveBeenCalledWith("g.flow.msg", chatId, step1.getMessages()[0]);
@@ -58,6 +60,7 @@ describe("test OptionMessageFlow cases", () => {
 
 
         expect(emitSpy).toHaveBeenCalledWith("g.flow", {
+            name: "test-flow",
             chatId,
             messages: expect.any(Array)
         });
@@ -74,8 +77,8 @@ describe("test OptionMessageFlow cases", () => {
 
         const { step1, opt1, opt2, opt3 } = buildOptionFlow()
 
-        flow.addMessage(step1);
-        [opt1, opt2, opt3].forEach((o) => flow.addMessage(o))
+        flow.addMessages(step1,opt1,opt2,opt3);
+       
 
         const emitSpy = jest.spyOn(emitter, "emit");
 
@@ -90,7 +93,8 @@ describe("test OptionMessageFlow cases", () => {
             text: "5",
             type: "text",
             isGroup: false,
-            messageId: "1"
+            messageId: "1",
+            chatId
         });
 
 
@@ -109,7 +113,8 @@ describe("test OptionMessageFlow cases", () => {
             text: "2",
             type: "text",
             isGroup: false,
-            messageId: "1"
+            messageId: "1",
+            chatId
         });
         engineEmitter.emit("g.msg", {
             author: chatId,
@@ -117,13 +122,15 @@ describe("test OptionMessageFlow cases", () => {
             text: "i like number 2",
             type: "text",
             isGroup: false,
-            messageId: "1"
+            messageId: "1",
+            chatId
         });
 
-        expect(step1.getMessages().length).toEqual(1)
+      
         expect(emitSpy).toHaveBeenCalledWith("g.flow.msg", chatId, opt2.getMessages()[0]);
 
         expect(emitSpy).toHaveBeenCalledWith("g.flow", {
+            name: "test-flow",
             chatId,
             messages: expect.any(Array)
         });

@@ -1,4 +1,6 @@
 import { IMessageReceived, IMessageSend } from "../../interfaces";
+import { IFlowOptions } from "../../interfaces/IFlowOptions";
+import { IFlowSession } from "../../interfaces/IFlowSession";
 import { EventGearEmitter } from "../EventGearEmitter";
 import { Gear } from "../Gear";
 import { DefaultMessageFlow } from "./DefaultMessageFlow";
@@ -9,6 +11,10 @@ import { DefaultMessageFlow } from "./DefaultMessageFlow";
  */
 export class DefaultFlow extends Gear {
 
+    constructor(private name: string, private options?: IFlowOptions) {
+
+        super(options ? options.enableLogs : false);
+    }
     /**
      * Map of message flows, indexed by ID.
      */
@@ -17,13 +23,12 @@ export class DefaultFlow extends Gear {
     /**
      * Active sessions mapped by chatId to their respective listeners.
      */
-    private sessions: Map<string, { listener: (msg: IMessageReceived) => void, sessionMessages: Map<string, DefaultMessageFlow> }> = new Map();
+    private sessions: Map<string, IFlowSession> = new Map();
 
     /**
     * first void message of flow.
     */
     private firstMessage?: IMessageSend | undefined;
-
 
     /**
     * last of flow.
@@ -105,34 +110,46 @@ export class DefaultFlow extends Gear {
         if (this.firstMessage) {
             this.getEmitter().emit("g.flow.msg", chatId, this.firstMessage)
         }
-        const listener = (msg: IMessageReceived) => {
+ 
+        const maxResponsesBeforeNextStepFlow = this.options?.maxResponsesBeforeNextStep || 1
+
+        const listener = async (msg: IMessageReceived) => {
             if ((msg.author === chatId || msg.author.includes(chatId)) && !msg.isMe) {
 
-                sessionMessages.get(messageNowId)?.setResponse(msg);
-                const nextId = sessionMessages.get(messageNowId)?.getNextId();
+                sessionMessages.get(messageNowId)?.addResponse(msg);
+                const sessionData = this.sessions.get(chatId) as IFlowSession;
+
+                if (sessionData.responsesBeforeNextStep < maxResponsesBeforeNextStepFlow) {
+                    this.sessions.set(chatId, { listener, sessionMessages, responsesBeforeNextStep: sessionData.responsesBeforeNextStep + 1 });
+                    return;
+                }
+                const nextId = sessionMessages.get(messageNowId)?.determineNextId();
 
                 if (nextId) {
                     messageNowId = nextId;
                     const nextMessage = sessionMessages.get(nextId);
 
                     if (nextMessage) {
+
                         nextMessage.getMessages().forEach((msg) =>
                             this.getEmitter().emit("g.flow.msg", chatId, msg)
                         );
                         messageNow = nextMessage;
+                        this.sessions.set(chatId, { listener, sessionMessages, responsesBeforeNextStep: 1 });
+
+
                     }
+
                 } else {
                     if (this.lastMessage) {
-                        if (this.firstMessage) {
-                            this.getEmitter().emit("g.flow.msg", chatId, this.lastMessage)
-                        }
+                        this.getEmitter().emit("g.flow.msg", chatId, this.lastMessage)
                     }
                     this.end(chatId, engineEmitter);
                 }
             }
         };
 
-        this.sessions.set(chatId, { listener, sessionMessages });
+        this.sessions.set(chatId, { listener, sessionMessages, responsesBeforeNextStep: 1 });
 
         engineEmitter.on("g.msg", listener);
 
@@ -178,6 +195,7 @@ export class DefaultFlow extends Gear {
         const session = this.sessions.get(chatId);
         if (session) {
             this.getEmitter().emit("g.flow", {
+                name: this.name,
                 chatId,
                 messages: this.getObjectMessages(chatId)
             });
@@ -188,15 +206,16 @@ export class DefaultFlow extends Gear {
         }
     }
 
-    protected getObjectMessages(chatId: string) {
+    protected getObjectMessages(chatId: string): DefaultMessageFlow[] {
         const session = this.sessions.get(chatId);
         if (!session) {
             throw new Error("session not found")
         }
-        const obj = Object.values(Object.fromEntries(session?.sessionMessages)).filter((m) => m.getResponse() != undefined)
-        
+        const obj = Object.values(Object.fromEntries(session?.sessionMessages)).filter((m) => m.getResponses().length > 0)
+
         return obj
 
     }
+
 
 }

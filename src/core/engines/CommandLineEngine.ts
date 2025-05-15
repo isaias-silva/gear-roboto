@@ -7,7 +7,15 @@ export class CommandLineEngine extends DefaultEngine {
 
     async send(to: string, message: IMessageSend) {
         const { text, type } = message
-        this.getEmitter().emit('g.msg', { type, author: "me", text, isGroup: false, messageId: Math.random().toString(32), isMe: true });
+        this.getEmitter().emit('g.msg', {
+            type,
+            author: "me",
+            chatId:"me",
+            text,
+             isGroup: false, 
+             messageId: Math.random().toString(32), 
+             isMe: true
+        });
 
     }
 
@@ -21,7 +29,15 @@ export class CommandLineEngine extends DefaultEngine {
             const text = await rl.question("")
             const author = "you"
 
-            this.getEmitter().emit('g.msg', { type: "text", author, text, isGroup: false, messageId: Math.random().toString(32), isMe: false });
+            this.getEmitter().emit('g.msg', {
+                type: "text",
+                chatId: author,
+                author,
+                text,
+                isGroup: false,
+                messageId: Math.random().toString(32),
+                isMe: false
+            });
 
             if (this.commander && this.commander?.isCommand(text)) {
                 const { command, args } = this.commander.extractCommandAndArgs(text)
@@ -33,10 +49,6 @@ export class CommandLineEngine extends DefaultEngine {
                     this.send(author, { type: "text", text: "command not found" })
                 }
             }
-
-
-
-
 
         }
         rl.close()

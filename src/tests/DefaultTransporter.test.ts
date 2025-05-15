@@ -34,10 +34,12 @@ describe("test transporter", () => {
         const spyTreatInfoMsg = jest.spyOn(transporter, "treatInfoMsg");
 
         transporter.transportInfoMsg({
-            type: "text", messageId: "mock-id",
+            type: "text",
+            messageId: "mock-id",
             author: "mock-author",
             isGroup: false,
-            isMe: false
+            isMe: false,
+            chatId: "mock-id"
         })
 
         expect(spyTreatInfoMsg).toHaveBeenCalled()
@@ -45,6 +47,7 @@ describe("test transporter", () => {
         const spyTreatInfoFlow = jest.spyOn(transporter, "transportInfoFlow");
 
         transporter.transportInfoFlow({
+            name: "test-flow",
             chatId: "mock-chatId",
             messages: []
         })
