@@ -10,13 +10,17 @@ describe("test flow", () => {
 
     beforeEach(() => {
         flow = new DefaultFlow("test-flow");
-        mockEngine = new TestEngine()
+        mockEngine = new TestEngine();
+        jest.useFakeTimers();
+
     })
     afterEach(() => {
         process.removeAllListeners("exit");
         process.removeAllListeners("beforeExit");
         process.removeAllListeners("SIGINT");
         process.removeAllListeners("uncaughtException");
+        jest.runOnlyPendingTimers();
+        jest.useRealTimers();
     });
 
     test("should add a message", () => {
@@ -330,12 +334,86 @@ describe("test flow", () => {
             isMe: false
         })
         expect(flowTwoResponses.inSession("two-response-man")).toBe(false)
-       
+
         expect(emitSpy).toHaveBeenCalledWith("g.flow", {
             name: "flowTwoResponses",
             chatId: "two-response-man",
             messages: expect.any(Array)
         });
+
+    })
+
+    jest.useFakeTimers();
+
+    test("Test timeout option", () => {
+
+        const { step1 } = buildDefaultFlow()
+
+        const flowTimeout = new DefaultFlow("flowTimeout", { enableLogs: false, maxResponsesBeforeNextStep: 2, waitingTimeForResponseMs: 3000 });
+        const engineEmitter = mockEngine.getEmitter()
+        flowTimeout.addMessage(step1)
+
+        flowTimeout.start("no-response-man", engineEmitter);
+
+
+        const emitSpy = jest.spyOn(flowTimeout.getEmitter(), "emit");
+
+        jest.advanceTimersByTime(3000);
+
+        expect(emitSpy).toHaveBeenCalledWith("g.flow", {
+            name: "flowTimeout",
+            chatId: "no-response-man",
+            messages: expect.any(Array)
+        });
+        expect(flowTimeout.inSession("no-response-man")).toBe(false)
+
+    })
+    test("Test timeout option with responses", () => {
+
+        const { step1, step2 } = buildDefaultFlow()
+
+        const flowTimeout = new DefaultFlow("flowTimeout", { enableLogs: false, maxResponsesBeforeNextStep: 2, waitingTimeForResponseMs: 3000 });
+        const engineEmitter = mockEngine.getEmitter()
+        flowTimeout.addMessages(step1, step2)
+
+        flowTimeout.start("no-response-man", engineEmitter);
+
+
+        const emitSpy = jest.spyOn(flowTimeout.getEmitter(), "emit");
+
+        jest.advanceTimersByTime(2000);
+
+        engineEmitter.emit("g.msg", {
+            author: "no-response-man",
+            chatId: "no-response-chat",
+            type: "text",
+            isGroup: false,
+            messageId: "hello",
+            isMe: false
+        })
+        jest.advanceTimersByTime(2000);
+
+        expect(emitSpy).not.toHaveBeenCalledWith("g.flow", {
+            name: "flowTimeout",
+            chatId: "no-response-man",
+            messages: expect.any(Array)
+        });
+
+         engineEmitter.emit("g.msg", {
+            author: "no-response-man",
+            chatId: "no-response-chat",
+            type: "text",
+            isGroup: false,
+            messageId: "bye",
+            isMe: false
+        })
+
+        expect(emitSpy).toHaveBeenCalledWith("g.flow", {
+            name: "flowTimeout",
+            chatId: "no-response-man",
+            messages: expect.any(Array)
+        });
+        expect(flowTimeout.inSession("no-response-man")).toBe(false)
 
     })
 })

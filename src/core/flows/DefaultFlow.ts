@@ -1,9 +1,11 @@
+import { NoMessagesInFlowException, SessionNotFoundException } from "../../exceptions";
 import { IMessageReceived, IMessageSend } from "../../interfaces";
 import { IFlowOptions } from "../../interfaces/IFlowOptions";
 import { IFlowSession } from "../../interfaces/IFlowSession";
 import { EventGearEmitter } from "../EventGearEmitter";
 import { Gear } from "../Gear";
 import { DefaultMessageFlow } from "./DefaultMessageFlow";
+import { Timer } from "../tools/Timer";
 
 /**
  * DefaultFlow manages a message-based conversation flow,
@@ -13,7 +15,8 @@ export class DefaultFlow extends Gear {
 
     constructor(private name: string, private options?: IFlowOptions) {
 
-        super(options ? options.enableLogs : false);
+        super(options?.enableLogs ?? false);
+
     }
     /**
      * Map of message flows, indexed by ID.
@@ -28,12 +31,13 @@ export class DefaultFlow extends Gear {
     /**
     * first void message of flow.
     */
-    private firstMessage?: IMessageSend | undefined;
+    private firstMessage?: IMessageSend;
 
     /**
     * last of flow.
     */
-    private lastMessage?: IMessageSend
+    private lastMessage?: IMessageSend;
+
 
 
     getMessagesFlow(): Map<string, DefaultMessageFlow> {
@@ -95,11 +99,18 @@ export class DefaultFlow extends Gear {
     start(chatId: string, engineEmitter: EventGearEmitter): void {
 
         if (this.enableLogs) {
-            this.logger.info(`start flow with ${chatId}`);
+            this.logger.info(`Start flow with ${chatId}`);
+        }
+
+        if (this.inSession(chatId)) {
+            if (this.enableLogs) {
+                this.logger.warn(`Session already started for chatId: ${chatId}`);
+            }
+            return;
         }
 
         if (this.messages.size === 0) {
-            throw new Error("No messages available");
+            throw new NoMessagesInFlowException("No messages available");
         }
 
         const sessionMessages = this.getSessionMessages()
@@ -110,12 +121,26 @@ export class DefaultFlow extends Gear {
         if (this.firstMessage) {
             this.getEmitter().emit("g.flow.msg", chatId, this.firstMessage)
         }
- 
+
         const maxResponsesBeforeNextStepFlow = this.options?.maxResponsesBeforeNextStep || 1
 
-        const listener = async (msg: IMessageReceived) => {
-            if ((msg.author === chatId || msg.author.includes(chatId)) && !msg.isMe) {
+        const timer = this.options?.waitingTimeForResponseMs
+            ? new Timer(this.options.waitingTimeForResponseMs, () => {
+                if (this.options?.timeoutMessage) {
+                    this.getEmitter().emit("g.flow.msg", chatId, this.options?.timeoutMessage)
+                }
+                this.end(chatId, engineEmitter)
+            })
+            : undefined;
 
+        timer?.start();
+
+        const listener = async (msg: IMessageReceived) => {
+           
+            if ((msg.author === chatId || msg.author.includes(chatId)) && !msg.isMe) {
+                if (timer) {
+                    timer?.reset()
+                }
                 sessionMessages.get(messageNowId)?.addResponse(msg);
                 const sessionData = this.sessions.get(chatId) as IFlowSession;
 
@@ -144,6 +169,9 @@ export class DefaultFlow extends Gear {
                     if (this.lastMessage) {
                         this.getEmitter().emit("g.flow.msg", chatId, this.lastMessage)
                     }
+                    if (timer) {
+                        timer?.stop()
+                    }
                     this.end(chatId, engineEmitter);
                 }
             }
@@ -155,7 +183,10 @@ export class DefaultFlow extends Gear {
 
         messageNow.getMessages().forEach((msg) =>
             this.getEmitter().emit("g.flow.msg", chatId, msg)
+
         );
+
+
     }
 
     /**
@@ -191,7 +222,6 @@ export class DefaultFlow extends Gear {
         if (this.enableLogs) {
             this.logger.info(`end session ${chatId}`);
         }
-
         const session = this.sessions.get(chatId);
         if (session) {
             this.getEmitter().emit("g.flow", {
@@ -209,7 +239,7 @@ export class DefaultFlow extends Gear {
     protected getObjectMessages(chatId: string): DefaultMessageFlow[] {
         const session = this.sessions.get(chatId);
         if (!session) {
-            throw new Error("session not found")
+            throw new SessionNotFoundException("Session not found")
         }
         const obj = Object.values(Object.fromEntries(session?.sessionMessages)).filter((m) => m.getResponses().length > 0)
 

@@ -12,15 +12,23 @@ export class RLogger {
         })
     }
 
+     private log(level: 'info' | 'error' | 'warn', message: any): void {
+        const formatted = typeof message !== "string" ? JSON.stringify(message) : message;
+        this.logger[level](formatted);
+    }
+
     info(message: any): void {
-        this.logger.info(JSON.stringify(message))
+        this.log('info', message);
     }
+
     error(message: any): void {
-        this.logger.error(JSON.stringify(message))
+        this.log('error', message);
     }
-    warn(message: string): void {
-        this.logger.warn(JSON.stringify(message))
+
+    warn(message: any): void {
+        this.log('warn', message);
     }
+    
     table(info: Map<any, any>, description?: string): void {
         if (description) {
             this.logger.info(description)
