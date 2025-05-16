@@ -19,13 +19,6 @@ export class CommandLineTransporter extends DefaultTransporter {
 
         console.log(`\n[Responses from "${chatId}"]\n`);
 
-        const questions: { question: string, answer: string }[] = []
-        messages.forEach((m) => {
-            const question = m.getName();
-            const answer = m.getResponse()?.text ?? "(no response)";
-
-            questions.push({ question, answer })
-        });
-        console.table(questions);
+      
     }
 }

@@ -2,6 +2,7 @@ import { messageType } from "../types/MessageType";
 
 export interface IMessageReceived {
     author: string,
+    chatId: string,
     text?: string,
     type: messageType,
     media?: Buffer | string,

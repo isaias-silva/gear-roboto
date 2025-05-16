@@ -5,7 +5,7 @@ describe("test KeyWordMessageFlow cases", () => {
     let flow: DefaultFlow
     let mockEngine: TestEngine
     beforeEach(() => {
-        flow = new DefaultFlow();
+        flow = new DefaultFlow("test-flow");
         mockEngine = new TestEngine()
     })
     afterEach(() => {
@@ -24,8 +24,7 @@ describe("test KeyWordMessageFlow cases", () => {
 
         step1.setNextId(step2.getId());
 
-        flow.addMessage(step1);
-        flow.addMessage(step2);
+        flow.addMessages(step1,step2);
 
         const emitSpy = jest.spyOn(emitter, "emit");
 
@@ -40,7 +39,8 @@ describe("test KeyWordMessageFlow cases", () => {
             text: "not",
             type: "text",
             isGroup: false,
-            messageId: "1"
+            messageId: "1",
+            chatId
         });
 
 
@@ -50,7 +50,8 @@ describe("test KeyWordMessageFlow cases", () => {
             text: "will not be answered",
             type: "text",
             isGroup: false,
-            messageId: "2"
+            messageId: "2",
+            chatId
         });
 
         expect(emitSpy).toHaveBeenCalledWith("g.flow.msg", chatId, step1.getMessages()[0]);
@@ -58,6 +59,7 @@ describe("test KeyWordMessageFlow cases", () => {
 
 
         expect(emitSpy).toHaveBeenCalledWith("g.flow", {
+            name: "test-flow",
             chatId,
             messages: expect.any(Array)
         });
@@ -71,20 +73,20 @@ describe("test KeyWordMessageFlow cases", () => {
         const emitter = flow.getEmitter();
 
         const chatId = "mock-chat";
-        
+
         const { step1, step2 } = buildKeyWordFlow()
 
         step1.setNextId(step2.getId());
-
-        flow.addMessage(step1);
-        flow.addMessage(step2);
+       
+        flow.addMessages(step1,step2);
 
         const emitSpy = jest.spyOn(emitter, "emit");
 
         const engineEmitter = mockEngine.getEmitter()
 
         flow.start(chatId, engineEmitter);
-
+       
+        expect(emitSpy).toHaveBeenCalledWith("g.flow.msg", chatId, step1.getMessages()[0]);
 
         engineEmitter.emit("g.msg", {
             author: chatId,
@@ -92,9 +94,11 @@ describe("test KeyWordMessageFlow cases", () => {
             text: "yes",
             type: "text",
             isGroup: false,
-            messageId: "1"
+            messageId: "1",
+            chatId
         });
 
+         expect(emitSpy).toHaveBeenCalledWith("g.flow.msg", chatId, step2.getMessages()[0]);
 
         engineEmitter.emit("g.msg", {
             author: chatId,
@@ -102,14 +106,14 @@ describe("test KeyWordMessageFlow cases", () => {
             text: "john",
             type: "text",
             isGroup: false,
-            messageId: "2"
+            messageId: "2",
+            chatId
         });
 
-        expect(emitSpy).toHaveBeenCalledWith("g.flow.msg", chatId, step1.getMessages()[0]);
-        expect(emitSpy).toHaveBeenCalledWith("g.flow.msg", chatId, step2.getMessages()[0]);
-
+       
 
         expect(emitSpy).toHaveBeenCalledWith("g.flow", {
+            name: "test-flow",
             chatId,
             messages: expect.any(Array)
         });
@@ -120,9 +124,9 @@ describe("test KeyWordMessageFlow cases", () => {
 })
 
 function buildKeyWordFlow() {
-    const step1 = new KeyWordMessageFlow("1", [{ type: "text", text: "go?" }], ["yes", "ok"]);
+    const step1 = new KeyWordMessageFlow("question", [{ type: "text", text: "go?" }], ["yes", "ok"]);
 
-    const step2 = new StoreMessageFlow("2", [{ type: "text", text: "whats your name?" }]);
+    const step2 = new StoreMessageFlow("name", [{ type: "text", text: "whats your name?" }]);
 
     return { step1, step2 }
 }

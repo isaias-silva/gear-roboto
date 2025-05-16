@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 export abstract class DefaultMessageFlow {
     private id: string;
     protected erroInResponse: boolean = false;
-    protected response?: IMessageReceived;
+    protected responses: IMessageReceived[] = [];
 
     private nextId?: string;
     private nextErrorId?: string;
@@ -25,27 +25,34 @@ export abstract class DefaultMessageFlow {
         return this.messages;
     }
 
-    getResponse() {
-        return this.response;
+    getResponses() {
+        return this.responses;
     }
 
-    setResponse(r: IMessageReceived) {
-        this.response = r;
+    addResponse(r: IMessageReceived) {
+        this.responses.push(r);
     }
     getNextId() {
-        return this.erroInResponse ? this.nextErrorId : this.nextId;
+      return this.nextId;
     }
 
     setNextId(next: string) {
         this.nextId = next
     }
-    
-    getNextErrorId(){
+
+    getNextErrorId() {
         return this.nextErrorId;
     }
     setNextErrorId(id: string) {
         this.nextErrorId = id;
     }
 
+    determineNextId(){
+        this.analyzeResponses();
+        return this.erroInResponse ? this.nextErrorId : this.nextId;
+    }
+
+
     abstract clone(): DefaultMessageFlow;
+    protected abstract analyzeResponses(): void;
 }

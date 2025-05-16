@@ -9,14 +9,18 @@ describe("test flow", () => {
     let mockEngine: TestEngine
 
     beforeEach(() => {
-        flow = new DefaultFlow();
-        mockEngine = new TestEngine()
+        flow = new DefaultFlow("test-flow");
+        mockEngine = new TestEngine();
+        jest.useFakeTimers();
+
     })
     afterEach(() => {
         process.removeAllListeners("exit");
         process.removeAllListeners("beforeExit");
         process.removeAllListeners("SIGINT");
         process.removeAllListeners("uncaughtException");
+        jest.runOnlyPendingTimers();
+        jest.useRealTimers();
     });
 
     test("should add a message", () => {
@@ -88,7 +92,8 @@ describe("test flow", () => {
             text: "world",
             type: "text",
             isGroup: false,
-            messageId: "1"
+            messageId: "1",
+            chatId
         });
 
 
@@ -98,7 +103,8 @@ describe("test flow", () => {
             text: "agony",
             type: "text",
             isGroup: false,
-            messageId: "2"
+            messageId: "2",
+            chatId
         });
 
         const messages: Map<String, DefaultMessageFlow> = new Map()
@@ -109,6 +115,7 @@ describe("test flow", () => {
         expect(emitSpy).toHaveBeenCalledWith("g.flow.msg", chatId, step2.getMessages()[0]);
 
         expect(emitSpy).toHaveBeenCalledWith("g.flow", {
+            name: "test-flow",
             chatId,
             messages: expect.any(Array)
         });
@@ -145,7 +152,8 @@ describe("test flow", () => {
             text: "world",
             type: "text",
             isGroup: false,
-            messageId: "1"
+            messageId: "1",
+            chatId: "mock-chat"
         });
 
 
@@ -155,13 +163,15 @@ describe("test flow", () => {
             text: "agony",
             type: "text",
             isGroup: false,
-            messageId: "2"
+            messageId: "2",
+            chatId: "mock-chat"
         });
 
         expect(emitSpy).toHaveBeenCalledWith("g.flow.msg", chatId, step1.getMessages()[0]);
         expect(emitSpy).toHaveBeenCalledWith("g.flow.msg", chatId, step2.getMessages()[0]);
 
         expect(emitSpy).toHaveBeenCalledWith("g.flow", {
+            name: "test-flow",
             chatId,
             messages: expect.any(Array)
         });
@@ -196,7 +206,8 @@ describe("test flow", () => {
             text: "world",
             type: "text",
             isGroup: false,
-            messageId: "1"
+            messageId: "1",
+            chatId: "mock-one"
         });
 
 
@@ -206,7 +217,8 @@ describe("test flow", () => {
             text: "world 2",
             type: "text",
             isGroup: false,
-            messageId: "2"
+            messageId: "2",
+            chatId: "mock-two"
         });
 
         expect(flow.inSession("mock-one")).toBe(false)
@@ -223,10 +235,10 @@ describe("test flow", () => {
         const responseTwo = eventTwo[1] as IFlowResponse;
 
         expect(responseOne.chatId).toEqual("mock-one")
-        expect(responseOne.messages[0].getResponse()?.text).toEqual("world")
+        expect(responseOne.messages[0].getResponses()[0].text).toEqual("world")
 
         expect(responseTwo.chatId).toEqual("mock-two")
-        expect(responseTwo.messages[0].getResponse()?.text).toEqual("world 2")
+        expect(responseTwo.messages[0].getResponses()[0].text).toEqual("world 2")
 
     })
 
@@ -252,7 +264,8 @@ describe("test flow", () => {
                     text: "hi i am a boy",
                     type: "text",
                     isGroup: false,
-                    messageId: "1"
+                    messageId: "1",
+                    chatId: "promise-chat"
                 });
             })(),
             (async () => {
@@ -262,7 +275,8 @@ describe("test flow", () => {
                     text: "hi i am a girl",
                     type: "text",
                     isGroup: false,
-                    messageId: "2"
+                    messageId: "2",
+                    chatId: "promise-chat"
                 });
             })()
         ])
@@ -283,10 +297,127 @@ describe("test flow", () => {
             return responseFlow.chatId == "promise-boy"
         })
         const messageResponse = promiseBoyResponse?.[1] as IFlowResponse
-        expect(messageResponse.messages[0].getResponse()?.text).toEqual("hi i am a boy")
+        expect(messageResponse.messages[0].getResponses()[0].text).toEqual("hi i am a boy")
+
+    })
+    test("test max responses before next step", () => {
+
+        const { step1 } = buildDefaultFlow()
+        const flowTwoResponses = new DefaultFlow("flowTwoResponses", { enableLogs: false, maxResponsesBeforeNextStep: 2 });
+        const engineEmitter = mockEngine.getEmitter()
+        flowTwoResponses.addMessage(step1)
+
+        flowTwoResponses.start("two-response-man", engineEmitter);
+
+
+        const emitSpy = jest.spyOn(flowTwoResponses.getEmitter(), "emit");
+
+        expect(flowTwoResponses.inSession("two-response-man")).toBe(true)
+
+        engineEmitter.emit("g.msg", {
+            author: "two-response-man",
+            chatId: "two-response-chat",
+            type: "text",
+            isGroup: false,
+            messageId: "one",
+            isMe: false
+        })
+
+        expect(flowTwoResponses.inSession("two-response-man")).toBe(true)
+
+        engineEmitter.emit("g.msg", {
+            author: "two-response-man",
+            chatId: "two-response-chat",
+            type: "text",
+            isGroup: false,
+            messageId: "two",
+            isMe: false
+        })
+        expect(flowTwoResponses.inSession("two-response-man")).toBe(false)
+
+        expect(emitSpy).toHaveBeenCalledWith("g.flow", {
+            name: "flowTwoResponses",
+            chatId: "two-response-man",
+            messages: expect.any(Array)
+        });
+
+    })
+
+    jest.useFakeTimers();
+
+    test("Test timeout option", () => {
+
+        const { step1 } = buildDefaultFlow()
+
+        const flowTimeout = new DefaultFlow("flowTimeout", { enableLogs: false, maxResponsesBeforeNextStep: 2, waitingTimeForResponseMs: 3000 });
+        const engineEmitter = mockEngine.getEmitter()
+        flowTimeout.addMessage(step1)
+
+        flowTimeout.start("no-response-man", engineEmitter);
+
+
+        const emitSpy = jest.spyOn(flowTimeout.getEmitter(), "emit");
+
+        jest.advanceTimersByTime(3000);
+
+        expect(emitSpy).toHaveBeenCalledWith("g.flow", {
+            name: "flowTimeout",
+            chatId: "no-response-man",
+            messages: expect.any(Array)
+        });
+        expect(flowTimeout.inSession("no-response-man")).toBe(false)
+
+    })
+    test("Test timeout option with responses", () => {
+
+        const { step1, step2 } = buildDefaultFlow()
+
+        const flowTimeout = new DefaultFlow("flowTimeout", { enableLogs: false, maxResponsesBeforeNextStep: 2, waitingTimeForResponseMs: 3000 });
+        const engineEmitter = mockEngine.getEmitter()
+        flowTimeout.addMessages(step1, step2)
+
+        flowTimeout.start("no-response-man", engineEmitter);
+
+
+        const emitSpy = jest.spyOn(flowTimeout.getEmitter(), "emit");
+
+        jest.advanceTimersByTime(2000);
+
+        engineEmitter.emit("g.msg", {
+            author: "no-response-man",
+            chatId: "no-response-chat",
+            type: "text",
+            isGroup: false,
+            messageId: "hello",
+            isMe: false
+        })
+        jest.advanceTimersByTime(2000);
+
+        expect(emitSpy).not.toHaveBeenCalledWith("g.flow", {
+            name: "flowTimeout",
+            chatId: "no-response-man",
+            messages: expect.any(Array)
+        });
+
+         engineEmitter.emit("g.msg", {
+            author: "no-response-man",
+            chatId: "no-response-chat",
+            type: "text",
+            isGroup: false,
+            messageId: "bye",
+            isMe: false
+        })
+
+        expect(emitSpy).toHaveBeenCalledWith("g.flow", {
+            name: "flowTimeout",
+            chatId: "no-response-man",
+            messages: expect.any(Array)
+        });
+        expect(flowTimeout.inSession("no-response-man")).toBe(false)
 
     })
 })
+
 
 function buildDefaultFlow() {
     const step1 = new StoreMessageFlow("1", [{ type: "text", text: "Hello" }]);

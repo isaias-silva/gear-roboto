@@ -59,7 +59,7 @@ describe("test default chatbot class", () => {
 
     test("should start flow", async () => {
         const spyInitFlowInEngine = jest.spyOn(engine, "startFlowInEngine");
-        await chatbot.startFlow("mock-chat", new DefaultFlow())
+        await chatbot.startFlow("mock-chat", new DefaultFlow("test-flow"))
         expect(spyInitFlowInEngine).toHaveBeenCalled()
 
 
