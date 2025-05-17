@@ -20,7 +20,7 @@ export class OptionMessageFlow extends DefaultMessageFlow {
 
     determineNextId(): string | undefined {
         this.analyzeResponses()
-       
+
         if (this.selectedOption) {
             return this.selectedOption.nextId;
         }
@@ -32,6 +32,7 @@ export class OptionMessageFlow extends DefaultMessageFlow {
         if (nextId) {
             clone.setNextId(nextId)
         }
+        clone.setResponseCount(this.getResponseCount())
         return clone;
 
     }
@@ -50,7 +51,7 @@ export class OptionMessageFlow extends DefaultMessageFlow {
         if (textOfResponses.length > 0) {
             this.opts.forEach((opt) => {
                 if (textOfResponses.find(v => v?.trim().toLowerCase() == opt.key)) {
-                    
+
                     this.erroInResponse = false
                     this.selectedOption = opt
                 }
@@ -61,7 +62,7 @@ export class OptionMessageFlow extends DefaultMessageFlow {
             this.responses.splice(0, this.responses.length - 1)
             this.messages.unshift(this.errorInOptionMessage);
         }
-       
+
     }
 
 }

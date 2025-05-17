@@ -24,12 +24,13 @@ export class KeyWordMessageFlow extends DefaultMessageFlow {
 
         if (nextErrorId) clone.setNextErrorId(nextErrorId)
 
+        clone.setResponseCount(this.getResponseCount())
         return clone;
 
     }
     protected analyzeResponses(): void {
         const textOfResponses = this.responses.map(r => r.text)
-      
+
         this.erroInResponse = true
         if (textOfResponses.length > 0) {
 
