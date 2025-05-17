@@ -4,7 +4,9 @@ export class RLogger {
     private logger: Logger
 
     constructor(className: string) {
-        this.logger = pino({
+        const isTest = process.env.NODE_ENV == 'test';
+
+        this.logger = pino(isTest ? {} : {
             base: { class: className },
             transport: {
                 target: 'pino-pretty'
@@ -12,7 +14,7 @@ export class RLogger {
         })
     }
 
-     private log(level: 'info' | 'error' | 'warn', message: any): void {
+    private log(level: 'info' | 'error' | 'warn', message: any): void {
         const formatted = typeof message !== "string" ? JSON.stringify(message) : message;
         this.logger[level](formatted);
     }
@@ -28,7 +30,7 @@ export class RLogger {
     warn(message: any): void {
         this.log('warn', message);
     }
-    
+
     table(info: Map<any, any>, description?: string): void {
         if (description) {
             this.logger.info(description)
