@@ -265,7 +265,7 @@ describe("test flow", () => {
                     type: "text",
                     isGroup: false,
                     messageId: "1",
-                    chatId: "promise-chat"
+                    chatId: "promise-boy"
                 });
             })(),
             (async () => {
@@ -276,7 +276,7 @@ describe("test flow", () => {
                     type: "text",
                     isGroup: false,
                     messageId: "2",
-                    chatId: "promise-chat"
+                    chatId: "promise-girl"
                 });
             })()
         ])
@@ -318,7 +318,7 @@ describe("test flow", () => {
 
         engineEmitter.emit("g.msg", {
             author: "two-response-man",
-            chatId: "two-response-chat",
+            chatId: "two-response-man",
             type: "text",
             isGroup: false,
             messageId: "one",
@@ -330,7 +330,7 @@ describe("test flow", () => {
 
         engineEmitter.emit("g.msg", {
             author: "two-response-man",
-            chatId: "two-response-chat",
+            chatId: "two-response-man",
             type: "text",
             isGroup: false,
             messageId: "two",
@@ -391,7 +391,7 @@ describe("test flow", () => {
 
         engineEmitter.emit("g.msg", {
             author: "no-response-man",
-            chatId: "no-response-chat",
+            chatId: "no-response-man",
             type: "text",
             isGroup: false,
             messageId: "hello",
@@ -407,7 +407,7 @@ describe("test flow", () => {
 
         engineEmitter.emit("g.msg", {
             author: "no-response-man",
-            chatId: "no-response-chat",
+            chatId: "no-response-man",
             type: "text",
             isGroup: false,
             messageId: "bye",
