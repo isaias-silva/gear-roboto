@@ -7,7 +7,9 @@ export class StoreMessageFlow extends DefaultMessageFlow {
         const nextId = this.getNextId()
         if (nextId) {
             clone.setNextId(nextId)
+            
         }
+        clone.setResponseCount(this.getResponseCount())
         return clone;
     }
 

@@ -122,8 +122,6 @@ export class DefaultFlow extends Gear {
             this.getEmitter().emit("g.flow.msg", chatId, this.firstMessage)
         }
 
-        const maxResponsesBeforeNextStepFlow = this.options?.maxResponsesBeforeNextStep || 1
-
         const timer = this.options?.waitingTimeForResponseMs
             ? new Timer(this.options.waitingTimeForResponseMs, () => {
                 if (this.options?.timeoutMessage) {
@@ -136,19 +134,24 @@ export class DefaultFlow extends Gear {
         timer?.start();
 
         const listener = async (msg: IMessageReceived) => {
-           
+
             if ((msg.author === chatId || msg.author.includes(chatId)) && !msg.isMe) {
                 if (timer) {
                     timer?.reset()
                 }
-                sessionMessages.get(messageNowId)?.addResponse(msg);
-                const sessionData = this.sessions.get(chatId) as IFlowSession;
+                const messageSession = sessionMessages.get(messageNowId)
 
-                if (sessionData.responsesBeforeNextStep < maxResponsesBeforeNextStepFlow) {
-                    this.sessions.set(chatId, { listener, sessionMessages, responsesBeforeNextStep: sessionData.responsesBeforeNextStep + 1 });
+                if (!messageSession) {
+                    return this.end(chatId, engineEmitter)
+                }
+                messageSession?.addResponse(msg)
+                sessionMessages.set(messageNowId, messageSession)
+               
+                const messageCount = messageSession.getResponseCount()
+                if (messageCount > messageSession.getResponses().length) {
                     return;
                 }
-                const nextId = sessionMessages.get(messageNowId)?.determineNextId();
+                const nextId = messageSession.determineNextId();
 
                 if (nextId) {
                     messageNowId = nextId;
@@ -160,7 +163,7 @@ export class DefaultFlow extends Gear {
                             this.getEmitter().emit("g.flow.msg", chatId, msg)
                         );
                         messageNow = nextMessage;
-                        this.sessions.set(chatId, { listener, sessionMessages, responsesBeforeNextStep: 1 });
+
 
 
                     }
@@ -177,7 +180,7 @@ export class DefaultFlow extends Gear {
             }
         };
 
-        this.sessions.set(chatId, { listener, sessionMessages, responsesBeforeNextStep: 1 });
+        this.sessions.set(chatId, { listener, sessionMessages });
 
         engineEmitter.on("g.msg", listener);
 

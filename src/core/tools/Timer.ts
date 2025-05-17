@@ -1,4 +1,3 @@
-import { RLogger } from "../RLogger";
 
 export class Timer {
     constructor(private durationMs: number, private callback: () => void) { }

@@ -8,11 +8,12 @@ export abstract class DefaultMessageFlow {
 
     private nextId?: string;
     private nextErrorId?: string;
+    private responsesCount: number;
 
     constructor(private name: string, protected messages: IMessageSend[], id?: string) {
         this.id = id || uuidv4()
+        this.responsesCount = 1
     }
-
 
     getId() {
         return this.id;
@@ -33,7 +34,7 @@ export abstract class DefaultMessageFlow {
         this.responses.push(r);
     }
     getNextId() {
-      return this.nextId;
+        return this.nextId;
     }
 
     setNextId(next: string) {
@@ -43,16 +44,23 @@ export abstract class DefaultMessageFlow {
     getNextErrorId() {
         return this.nextErrorId;
     }
+
     setNextErrorId(id: string) {
         this.nextErrorId = id;
     }
-
-    determineNextId(){
+    getResponseCount() {
+        return this.responsesCount;
+    }
+    setResponseCount(responsesCount: number) {
+        this.responsesCount = responsesCount;
+    }
+    determineNextId() {
         this.analyzeResponses();
         return this.erroInResponse ? this.nextErrorId : this.nextId;
     }
 
 
     abstract clone(): DefaultMessageFlow;
+    
     protected abstract analyzeResponses(): void;
 }

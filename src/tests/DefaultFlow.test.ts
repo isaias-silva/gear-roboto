@@ -302,10 +302,12 @@ describe("test flow", () => {
     })
     test("test max responses before next step", () => {
 
-        const { step1 } = buildDefaultFlow()
-        const flowTwoResponses = new DefaultFlow("flowTwoResponses", { enableLogs: false, maxResponsesBeforeNextStep: 2 });
+        const messageToTwoResponses = new StoreMessageFlow("data", [{ type: "text", text: "talk 2 fruits" }])
+        messageToTwoResponses.setResponseCount(2)
+      
+        const flowTwoResponses = new DefaultFlow("flowTwoResponses", { enableLogs: false });
         const engineEmitter = mockEngine.getEmitter()
-        flowTwoResponses.addMessage(step1)
+        flowTwoResponses.addMessage(messageToTwoResponses)
 
         flowTwoResponses.start("two-response-man", engineEmitter);
 
@@ -320,6 +322,7 @@ describe("test flow", () => {
             type: "text",
             isGroup: false,
             messageId: "one",
+            text:"apple",
             isMe: false
         })
 
@@ -331,6 +334,7 @@ describe("test flow", () => {
             type: "text",
             isGroup: false,
             messageId: "two",
+            text:"mango",
             isMe: false
         })
         expect(flowTwoResponses.inSession("two-response-man")).toBe(false)
@@ -343,13 +347,13 @@ describe("test flow", () => {
 
     })
 
-    jest.useFakeTimers();
+
 
     test("Test timeout option", () => {
 
         const { step1 } = buildDefaultFlow()
 
-        const flowTimeout = new DefaultFlow("flowTimeout", { enableLogs: false, maxResponsesBeforeNextStep: 2, waitingTimeForResponseMs: 3000 });
+        const flowTimeout = new DefaultFlow("flowTimeout", { enableLogs: false, waitingTimeForResponseMs: 3000 });
         const engineEmitter = mockEngine.getEmitter()
         flowTimeout.addMessage(step1)
 
@@ -372,8 +376,10 @@ describe("test flow", () => {
 
         const { step1, step2 } = buildDefaultFlow()
 
-        const flowTimeout = new DefaultFlow("flowTimeout", { enableLogs: false, maxResponsesBeforeNextStep: 2, waitingTimeForResponseMs: 3000 });
+        const flowTimeout = new DefaultFlow("flowTimeout", { enableLogs: false, waitingTimeForResponseMs: 3000 });
         const engineEmitter = mockEngine.getEmitter()
+
+        step1.setNextId(step2.getId());
         flowTimeout.addMessages(step1, step2)
 
         flowTimeout.start("no-response-man", engineEmitter);
@@ -381,7 +387,7 @@ describe("test flow", () => {
 
         const emitSpy = jest.spyOn(flowTimeout.getEmitter(), "emit");
 
-        jest.advanceTimersByTime(2000);
+        jest.advanceTimersByTime(1000);
 
         engineEmitter.emit("g.msg", {
             author: "no-response-man",
@@ -391,7 +397,7 @@ describe("test flow", () => {
             messageId: "hello",
             isMe: false
         })
-        jest.advanceTimersByTime(2000);
+        jest.advanceTimersByTime(1000);
 
         expect(emitSpy).not.toHaveBeenCalledWith("g.flow", {
             name: "flowTimeout",
@@ -399,7 +405,7 @@ describe("test flow", () => {
             messages: expect.any(Array)
         });
 
-         engineEmitter.emit("g.msg", {
+        engineEmitter.emit("g.msg", {
             author: "no-response-man",
             chatId: "no-response-chat",
             type: "text",
