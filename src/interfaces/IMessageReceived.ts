@@ -8,5 +8,6 @@ export interface IMessageReceived {
     media?: Buffer | string,
     isGroup: boolean,
     messageId: string,
-    isMe: boolean
+    isMe: boolean,
+    replyMessage?:IMessageReceived
 }

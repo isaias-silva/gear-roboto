@@ -234,7 +234,7 @@ export class DefaultFlow extends Gear {
 
     }
     private isValidMessage(msg: IMessageReceived, chatId: string) {
-        return (msg.author === chatId || msg.author.includes(chatId)) && !msg.isMe;
+        return msg.chatId === chatId  && !msg.isMe;
     }
 
 }
