@@ -113,21 +113,21 @@ export class DefaultFlow extends Gear {
             throw new NoMessagesInFlowException("No messages available");
         }
 
-        const sessionMessages = this.getSessionMessages()
+        const sessionMessages = this.cloneMessages();
 
-        let [messageNowId, messageNow] = Array.from(sessionMessages)[0];
+        let [currentMessageId, currentMessage] = Array.from(sessionMessages)[0];
 
 
         if (this.firstMessage) {
-            this.getEmitter().emit("g.flow.msg", chatId, this.firstMessage)
+            this.getEmitter().emit("g.flow.msg", chatId, this.firstMessage);
         }
 
         const timer = this.options?.waitingTimeForResponseMs
             ? new Timer(this.options.waitingTimeForResponseMs, () => {
                 if (this.options?.timeoutMessage) {
-                    this.getEmitter().emit("g.flow.msg", chatId, this.options?.timeoutMessage)
+                    this.getEmitter().emit("g.flow.msg", chatId, this.options?.timeoutMessage);
                 }
-                this.end(chatId, engineEmitter)
+                this.end(chatId, engineEmitter);
             })
             : undefined;
 
@@ -135,45 +135,38 @@ export class DefaultFlow extends Gear {
 
         const listener = async (msg: IMessageReceived) => {
 
-            if ((msg.author === chatId || msg.author.includes(chatId)) && !msg.isMe) {
+            if (this.isValidMessage(msg, chatId)) {
                 if (timer) {
-                    timer?.reset()
+                    timer?.reset();
                 }
-                const messageSession = sessionMessages.get(messageNowId)
+                const messageSession = sessionMessages.get(currentMessageId);
 
                 if (!messageSession) {
-                    return this.end(chatId, engineEmitter)
+                    return this.end(chatId, engineEmitter);
                 }
-                messageSession?.addResponse(msg)
-                sessionMessages.set(messageNowId, messageSession)
-               
-                const messageCount = messageSession.getResponseCount()
+                messageSession?.addResponse(msg);
+                sessionMessages.set(currentMessageId, messageSession);
+
+                const messageCount = messageSession.getResponseCount();
                 if (messageCount > messageSession.getResponses().length) {
                     return;
                 }
                 const nextId = messageSession.determineNextId();
 
                 if (nextId) {
-                    messageNowId = nextId;
+                    currentMessageId = nextId;
                     const nextMessage = sessionMessages.get(nextId);
 
                     if (nextMessage) {
-
-                        nextMessage.getMessages().forEach((msg) =>
-                            this.getEmitter().emit("g.flow.msg", chatId, msg)
-                        );
-                        messageNow = nextMessage;
-
-
-
+                        nextMessage.getMessages().forEach((msg) => this.getEmitter().emit("g.flow.msg", chatId, msg));
+                        currentMessage = nextMessage;
                     }
-
                 } else {
                     if (this.lastMessage) {
-                        this.getEmitter().emit("g.flow.msg", chatId, this.lastMessage)
+                        this.getEmitter().emit("g.flow.msg", chatId, this.lastMessage);
                     }
                     if (timer) {
-                        timer?.stop()
+                        timer?.stop();
                     }
                     this.end(chatId, engineEmitter);
                 }
@@ -184,12 +177,7 @@ export class DefaultFlow extends Gear {
 
         engineEmitter.on("g.msg", listener);
 
-        messageNow.getMessages().forEach((msg) =>
-            this.getEmitter().emit("g.flow.msg", chatId, msg)
-
-        );
-
-
+        currentMessage.getMessages().forEach((msg) => this.getEmitter().emit("g.flow.msg", chatId, msg));
     }
 
     /**
@@ -200,7 +188,6 @@ export class DefaultFlow extends Gear {
      */
     stop(chatId: string, engineEmitter: EventGearEmitter): void {
         const session = this.sessions.get(chatId);
-
         if (session) {
             engineEmitter.removeListener("g.msg", session.listener);
             this.sessions.delete(chatId);
@@ -210,13 +197,10 @@ export class DefaultFlow extends Gear {
         }
     }
 
-    protected getSessionMessages(): Map<string, DefaultMessageFlow> {
+    protected cloneMessages(): Map<string, DefaultMessageFlow> {
         const cloneMessages: Map<string, DefaultMessageFlow> = new Map();
 
-        this.messages.forEach((v, k) =>
-
-            cloneMessages.set(k, v.clone())
-        )
+        this.messages.forEach((v, k) => cloneMessages.set(k, v.clone()))
 
         return cloneMessages;
     }
@@ -242,13 +226,15 @@ export class DefaultFlow extends Gear {
     protected getObjectMessages(chatId: string): DefaultMessageFlow[] {
         const session = this.sessions.get(chatId);
         if (!session) {
-            throw new SessionNotFoundException("Session not found")
+            throw new SessionNotFoundException("Session not found");
         }
-        const obj = Object.values(Object.fromEntries(session?.sessionMessages)).filter((m) => m.getResponses().length > 0)
+        const obj = Object.values(Object.fromEntries(session?.sessionMessages)).filter((m) => m.getResponses().length > 0);
 
-        return obj
+        return obj;
 
     }
-
+    private isValidMessage(msg: IMessageReceived, chatId: string) {
+        return msg.chatId === chatId  && !msg.isMe;
+    }
 
 }

@@ -1,21 +1,20 @@
 {
   "name": "gear-roboto",
-
-  "version": "2.2.1",
-
-
+  "version": "2.2.3",
   "description": "a framework to facilitate the creation of chatbots",
   "scripts": {
     "start": "node ./dist/index.js",
     "dev": "ts-node-dev ./src/index.ts test",
     "build": "tsup",
-    "test": "jest"
+    "test": "jest --detectOpenHandles"
   },
   "keywords": [
     "chatbot",
     "automation",
     "typescript",
-    "node"
+    "node",
+    "messages",
+    "chat"
   ],
   "author": "zack",
   "license": "ISC",
@@ -33,9 +32,7 @@
     "pino-pretty": "^13.0.0",
     "uuid": "^11.0.3"
   },
-
   "main": "./dist/index.js",
-
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
