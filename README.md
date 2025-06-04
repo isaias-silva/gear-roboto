@@ -1,5 +1,6 @@
-# gear-roboto
+# Gear-roboto
 
+<img src="logo.png" style="width:200px">
 
 **gear-roboto** is a mini framework for creating and organizing chatbot logic, allowing message transport message flow and event monitoring.
 
@@ -142,22 +143,23 @@ Flows are responsible for emulating a conversation with the chatbot without rely
 The class responsible for managing a flow is ```DefaultFlow```, the main methods of this class are:
 
 - `start`: start a flow.
-- `addMessage`: add Message in a flow.
-- `setFirstMessage`: define the first message of a flow.
-- `setLastMessage`: define the last message of a flow.
-- `getLastMessage`: return the last message of a flow.
-- `getFirstMessage`: return the first message of a flow.
+- `addMessage`: add a message in flow.
+- `addMessages`: add many messages in flow.
+- `setFirstMessage`: define the first message of flow.
+- `setLastMessage`: define the last message of flow.
+- `getLastMessage`: return the last message of flow.
+- `getFirstMessage`: return the first message of flow.
 - `removeMessage`: remove a message by id.
 
 #### 🎯 flow messages:
-Structures that store and process responses have a special class, we use `DefaultMessageFlow` and its child classes.<br>
-DefaultMessageFlow receives an array of `IMessageSend` that will be sent in sequence, the class and its children have a **linked list logic**, each object of the class has an id and a nextId of another object of the same class, the latter being able to be null, which would end the flow.
+Structures that store and process responses have a special class, we use child classes of `DefaultMessageFlow`.<br>
+StoreMessageFlow receives an array of `IMessageSend` that will be sent in sequence, the class and its children have a **linked list logic**, each object of the class has an id and a nextId of another object of the same class, the latter being able to be null, which would end the flow.
 
 ```typescript
 const flow = new DefaultFlow("test-flow");
 
-const nameMessage = new DefaultMessageFlow("YOUR_NAME", [{ type: "text", text: "what's your name?" }]); //define message
-const ageMessage = new DefaultMessageFlow("YOUR_AGE", [{type:"text",text:"great!"},{ type: "text", text: "how old are you?" }]);
+const nameMessage = new StoreMessageFlow("YOUR_NAME", [{ type: "text", text: "what's your name?" }]); //define message
+const ageMessage = new StoreMessageFlow("YOUR_AGE", [{type:"text",text:"great!"},{ type: "text", text: "how old are you?" }]);
 
 nameMessage.setNextId(ageMessage.getId()) //set next message by id
 
@@ -171,7 +173,7 @@ So far there are 3 types of MessageFlow:
 
 | Class                | description                                                                                                                                                                                                          |
 | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `DefaultMessageFlow` | basic class, just stores the response                                                                                                                                                                                |
+| `StoreMessageFlow`   | basic class, just stores the response                                                                                                                                                                                |
 | `KeyWordMessageFlow` | compares whether the response has any of the keywords, if yes, it points to the next message, if no, it points to the error message or ends the flow if it is the last message                                       |
 | `OptionMessageFlow`  | receives an object with options, the options can be numbers or strings, each option will point to a message of any type, if the response does not satisfy the options, the message is sent again informing the error |
 
@@ -179,10 +181,10 @@ So far there are 3 types of MessageFlow:
 
 #### 🧩 practical use of MessageFlow classes
 
-- **DefaultMessageFlow**:
+- **StoreMessageFlow**:
     ```javascript
 
-    const nameMessage = new DefaultMessageFlow("YOUR_NAME", [{ type: "text", text: "what's your name?" }]);
+    const nameMessage = new StoreMessageFlow("YOUR_NAME", [{ type: "text", text: "what's your name?" }]);
     flow.addMessage(nameMessage)
    
     ```
@@ -193,11 +195,11 @@ So far there are 3 types of MessageFlow:
     const isRioPeopleMessage = new KeyWordMessageFlow("IS_RJ_PEOPLE", [{ type: "text", text: "Do you live in Rio de Janeiro?" }],["yes","yeah"]);
    
    //If the keywords are found in the response, the next message will be:
-    const bestRestaurantInRioFromMessage = new DefaultMessageFlow("BEST_RESTAURANT", [{ type: "text", text: "What is the best restaurant in Rio?" }]);
+    const bestRestaurantInRioFromMessage = new StoreMessageFlow("BEST_RESTAURANT", [{ type: "text", text: "What is the best restaurant in Rio?" }]);
     isRioPeopleMessage.setNextId(bestRestaurantInRioFromMessage)
    
    //otherwise the next message will be:
-    const whereAreYouFromMessage = new DefaultMessageFlow("YOUR_CITY", [{ type: "text", text: "Oh... where are you from?" }]);
+    const whereAreYouFromMessage = new StoreMessageFlow("YOUR_CITY", [{ type: "text", text: "Oh... where are you from?" }]);
     isRioPeopleMessage.setNextErrorId(whereAreYouFromMessage)
     
     flow.addMessage(isRioPeopleMessage)
@@ -209,9 +211,9 @@ So far there are 3 types of MessageFlow:
     ```typescript
 
     //define options:
-    const opt1 = new DefaultMessageFlow("1", [{ type: "text", text: "talk about number one:" }]);
-    const opt2 = new DefaultMessageFlow("1", [{ type: "text", text: "talk about number two:" }]);
-    const opt3 = new DefaultMessageFlow("1", [{ type: "text", text: "talk about number three:" }]);
+    const opt1 = new StoreMessageFlow("1", [{ type: "text", text: "talk about number one:" }]);
+    const opt2 = new StoreMessageFlow("2", [{ type: "text", text: "talk about number two:" }]);
+    const opt3 = new StoreMessageFlow("3", [{ type: "text", text: "talk about number three:" }]);
 
     //define menu
     const menu = new OptionMessageFlow(
@@ -226,9 +228,8 @@ So far there are 3 types of MessageFlow:
     );
 
     flow.addMessage(menu)
-    flow.addMessage(opt1)
-    flow.addMessage(opt2)
-    flow.addMessage(opt3)
+    flow.addMessages(opt1,opt2,opt3)
+    
    
     ```
 > the first MessageFlow to be added to the flow is the first one to be sent right after sending the firstMessage
