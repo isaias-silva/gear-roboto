@@ -101,10 +101,10 @@ export class DefaultChatBot<E extends DefaultEngine, T extends DefaultTransporte
 
 
 
-    private async observer(): Promise<void> {
-        this.engine.getEmitter().on("g.conn", (msg) => this.transporter.transportInfoConn(msg));
-        this.engine.getEmitter().on("g.msg", (msg) => this.transporter.transportInfoMsg(msg));
-        this.engine.getEmitter().on("g.flow", (msg) => this.transporter.transportInfoFlow(msg))
+    protected async observer(): Promise<void> {
+        this.engine.getEmitter().on("gear.connection.status", (msg) => this.transporter.transportInfoConn(msg));
+        this.engine.getEmitter().on("gear.message.received", (msg) => this.transporter.transportInfoMsg(msg));
+        this.engine.getEmitter().on("gear.flow.end", (msg) => this.transporter.transportInfoFlow(msg))
 
     }
 }

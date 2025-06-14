@@ -31,10 +31,5 @@ export class RLogger {
         this.log('warn', message);
     }
 
-    table(info: Map<any, any>, description?: string): void {
-        if (description) {
-            this.logger.info(description)
-        }
-        console.table(info)
-    }
+
 }

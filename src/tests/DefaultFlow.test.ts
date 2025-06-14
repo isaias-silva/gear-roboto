@@ -49,7 +49,7 @@ describe("test flow", () => {
 
         flow.start("mock-chat", mockEmitter);
 
-        expect(mockEmit).toHaveBeenCalledWith('g.flow.msg',
+        expect(mockEmit).toHaveBeenCalledWith('gear.message.send',
             "mock-chat",
             { text: "hello", type: "text" }
         );
@@ -86,7 +86,7 @@ describe("test flow", () => {
         flow.start(chatId, engineEmitter);
 
 
-        engineEmitter.emit("g.msg", {
+        engineEmitter.emit("gear.message.received", {
             author: chatId,
             isMe: false,
             text: "world",
@@ -97,7 +97,7 @@ describe("test flow", () => {
         });
 
 
-        engineEmitter.emit("g.msg", {
+        engineEmitter.emit("gear.message.received", {
             author: chatId,
             isMe: false,
             text: "agony",
@@ -111,10 +111,10 @@ describe("test flow", () => {
         messages.set(step1.getId(), step1)
         messages.set(step2.getId(), step2)
 
-        expect(emitSpy).toHaveBeenCalledWith("g.flow.msg", chatId, step1.getMessages()[0]);
-        expect(emitSpy).toHaveBeenCalledWith("g.flow.msg", chatId, step2.getMessages()[0]);
+        expect(emitSpy).toHaveBeenCalledWith("gear.message.send", chatId, step1.getMessages()[0]);
+        expect(emitSpy).toHaveBeenCalledWith("gear.message.send", chatId, step2.getMessages()[0]);
 
-        expect(emitSpy).toHaveBeenCalledWith("g.flow", {
+        expect(emitSpy).toHaveBeenCalledWith("gear.flow.end", {
             name: "test-flow",
             chatId,
             messages: expect.any(Array)
@@ -146,7 +146,7 @@ describe("test flow", () => {
         flow.start(chatId, engineEmitter);
 
 
-        engineEmitter.emit("g.msg", {
+        engineEmitter.emit("gear.message.received", {
             author: chatId,
             isMe: false,
             text: "world",
@@ -157,7 +157,7 @@ describe("test flow", () => {
         });
 
 
-        engineEmitter.emit("g.msg", {
+        engineEmitter.emit("gear.message.received", {
             author: chatId,
             isMe: false,
             text: "agony",
@@ -167,10 +167,10 @@ describe("test flow", () => {
             chatId: "mock-chat"
         });
 
-        expect(emitSpy).toHaveBeenCalledWith("g.flow.msg", chatId, step1.getMessages()[0]);
-        expect(emitSpy).toHaveBeenCalledWith("g.flow.msg", chatId, step2.getMessages()[0]);
+        expect(emitSpy).toHaveBeenCalledWith("gear.message.send", chatId, step1.getMessages()[0]);
+        expect(emitSpy).toHaveBeenCalledWith("gear.message.send", chatId, step2.getMessages()[0]);
 
-        expect(emitSpy).toHaveBeenCalledWith("g.flow", {
+        expect(emitSpy).toHaveBeenCalledWith("gear.flow.end", {
             name: "test-flow",
             chatId,
             messages: expect.any(Array)
@@ -200,7 +200,7 @@ describe("test flow", () => {
         expect(flow.inSession("mock-one")).toBe(true)
         expect(flow.inSession("mock-two")).toBe(true)
 
-        engineEmitter.emit("g.msg", {
+        engineEmitter.emit("gear.message.received", {
             author: "mock-one",
             isMe: false,
             text: "world",
@@ -211,7 +211,7 @@ describe("test flow", () => {
         });
 
 
-        engineEmitter.emit("g.msg", {
+        engineEmitter.emit("gear.message.received", {
             author: "mock-two",
             isMe: false,
             text: "world 2",
@@ -225,7 +225,7 @@ describe("test flow", () => {
         expect(flow.inSession("mock-two")).toBe(false)
 
         const callsEnd = emitSpy.mock.calls.filter(
-            ([eventName]) => eventName === "g.flow"
+            ([eventName]) => eventName === "gear.flow.end"
         );
         expect(callsEnd.length).toEqual(2);
 
@@ -258,7 +258,7 @@ describe("test flow", () => {
 
         const sends = Promise.all([
             (async () => {
-                engineEmitter.emit("g.msg", {
+                engineEmitter.emit("gear.message.received", {
                     author: "promise-boy",
                     isMe: false,
                     text: "hi i am a boy",
@@ -269,7 +269,7 @@ describe("test flow", () => {
                 });
             })(),
             (async () => {
-                engineEmitter.emit("g.msg", {
+                engineEmitter.emit("gear.message.received", {
                     author: "promise-girl",
                     isMe: false,
                     text: "hi i am a girl",
@@ -287,7 +287,7 @@ describe("test flow", () => {
         expect(flow.inSession("promise-girl")).toBe(false)
 
         const callsEnd = emitSpy.mock.calls.filter(
-            ([eventName]) => eventName === "g.flow"
+            ([eventName]) => eventName === "gear.flow.end"
         );
 
         expect(callsEnd.length).toEqual(2);
@@ -316,7 +316,7 @@ describe("test flow", () => {
 
         expect(flowTwoResponses.inSession("two-response-man")).toBe(true)
 
-        engineEmitter.emit("g.msg", {
+        engineEmitter.emit("gear.message.received", {
             author: "two-response-man",
             chatId: "two-response-man",
             type: "text",
@@ -328,7 +328,7 @@ describe("test flow", () => {
 
         expect(flowTwoResponses.inSession("two-response-man")).toBe(true)
 
-        engineEmitter.emit("g.msg", {
+        engineEmitter.emit("gear.message.received", {
             author: "two-response-man",
             chatId: "two-response-man",
             type: "text",
@@ -339,7 +339,7 @@ describe("test flow", () => {
         })
         expect(flowTwoResponses.inSession("two-response-man")).toBe(false)
 
-        expect(emitSpy).toHaveBeenCalledWith("g.flow", {
+        expect(emitSpy).toHaveBeenCalledWith("gear.flow.end", {
             name: "flowTwoResponses",
             chatId: "two-response-man",
             messages: expect.any(Array)
@@ -364,7 +364,7 @@ describe("test flow", () => {
 
         jest.advanceTimersByTime(3000);
 
-        expect(emitSpy).toHaveBeenCalledWith("g.flow", {
+        expect(emitSpy).toHaveBeenCalledWith("gear.flow.end", {
             name: "flowTimeout",
             chatId: "no-response-man",
             messages: expect.any(Array)
@@ -389,7 +389,7 @@ describe("test flow", () => {
 
         jest.advanceTimersByTime(1000);
 
-        engineEmitter.emit("g.msg", {
+        engineEmitter.emit("gear.message.received", {
             author: "no-response-man",
             chatId: "no-response-man",
             type: "text",
@@ -399,13 +399,13 @@ describe("test flow", () => {
         })
         jest.advanceTimersByTime(1000);
 
-        expect(emitSpy).not.toHaveBeenCalledWith("g.flow", {
+        expect(emitSpy).not.toHaveBeenCalledWith("gear.flow.end", {
             name: "flowTimeout",
             chatId: "no-response-man",
             messages: expect.any(Array)
         });
 
-        engineEmitter.emit("g.msg", {
+        engineEmitter.emit("gear.message.received", {
             author: "no-response-man",
             chatId: "no-response-man",
             type: "text",
@@ -414,7 +414,7 @@ describe("test flow", () => {
             isMe: false
         })
 
-        expect(emitSpy).toHaveBeenCalledWith("g.flow", {
+        expect(emitSpy).toHaveBeenCalledWith("gear.flow.end", {
             name: "flowTimeout",
             chatId: "no-response-man",
             messages: expect.any(Array)

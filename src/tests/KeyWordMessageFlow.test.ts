@@ -33,7 +33,7 @@ describe("test KeyWordMessageFlow cases", () => {
         flow.start(chatId, engineEmitter);
 
 
-        engineEmitter.emit("g.msg", {
+        engineEmitter.emit("gear.message.received", {
             author: chatId,
             isMe: false,
             text: "not",
@@ -44,7 +44,7 @@ describe("test KeyWordMessageFlow cases", () => {
         });
 
 
-        engineEmitter.emit("g.msg", {
+        engineEmitter.emit("gear.message.received", {
             author: chatId,
             isMe: false,
             text: "will not be answered",
@@ -54,11 +54,11 @@ describe("test KeyWordMessageFlow cases", () => {
             chatId
         });
 
-        expect(emitSpy).toHaveBeenCalledWith("g.flow.msg", chatId, step1.getMessages()[0]);
-        expect(emitSpy).not.toHaveBeenCalledWith("g.flow.msg", chatId, step2.getMessages()[0]);
+        expect(emitSpy).toHaveBeenCalledWith("gear.message.send", chatId, step1.getMessages()[0]);
+        expect(emitSpy).not.toHaveBeenCalledWith("gear.message.send", chatId, step2.getMessages()[0]);
 
 
-        expect(emitSpy).toHaveBeenCalledWith("g.flow", {
+        expect(emitSpy).toHaveBeenCalledWith("gear.flow.end", {
             name: "test-flow",
             chatId,
             messages: expect.any(Array)
@@ -86,9 +86,9 @@ describe("test KeyWordMessageFlow cases", () => {
 
         flow.start(chatId, engineEmitter);
        
-        expect(emitSpy).toHaveBeenCalledWith("g.flow.msg", chatId, step1.getMessages()[0]);
+        expect(emitSpy).toHaveBeenCalledWith("gear.message.send", chatId, step1.getMessages()[0]);
 
-        engineEmitter.emit("g.msg", {
+        engineEmitter.emit("gear.message.received", {
             author: chatId,
             isMe: false,
             text: "yes",
@@ -98,9 +98,9 @@ describe("test KeyWordMessageFlow cases", () => {
             chatId
         });
 
-         expect(emitSpy).toHaveBeenCalledWith("g.flow.msg", chatId, step2.getMessages()[0]);
+         expect(emitSpy).toHaveBeenCalledWith("gear.message.send", chatId, step2.getMessages()[0]);
 
-        engineEmitter.emit("g.msg", {
+        engineEmitter.emit("gear.message.received", {
             author: chatId,
             isMe: false,
             text: "john",
@@ -112,7 +112,7 @@ describe("test KeyWordMessageFlow cases", () => {
 
        
 
-        expect(emitSpy).toHaveBeenCalledWith("g.flow", {
+        expect(emitSpy).toHaveBeenCalledWith("gear.flow.end", {
             name: "test-flow",
             chatId,
             messages: expect.any(Array)

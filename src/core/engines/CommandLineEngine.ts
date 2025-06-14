@@ -7,7 +7,7 @@ export class CommandLineEngine extends DefaultEngine {
 
     async send(to: string, message: IMessageSend) {
         const { text, type } = message
-        this.getEmitter().emit('g.msg', {
+        this.getEmitter().emit('gear.message.received', {
             type,
             author: "me",
             chatId:"me",
@@ -29,7 +29,7 @@ export class CommandLineEngine extends DefaultEngine {
             const text = await rl.question("")
             const author = "you"
 
-            this.getEmitter().emit('g.msg', {
+            this.getEmitter().emit('gear.message.received', {
                 type: "text",
                 chatId: author,
                 author,

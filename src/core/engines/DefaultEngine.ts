@@ -50,7 +50,7 @@ export abstract class DefaultEngine extends Gear {
 
         adInfo.set('id', id)
 
-        this.getEmitter().emit('g.conn', { status: this.status, adInfo })
+        this.getEmitter().emit('gear.connection.status', { status: this.status, adInfo })
 
         this.monitoring();
 
@@ -71,7 +71,7 @@ export abstract class DefaultEngine extends Gear {
         const adInfo = new Map()
         adInfo.set('id', id)
 
-        this.getEmitter().emit('g.conn', { status: this.status, adInfo })
+        this.getEmitter().emit('gear.connection.status', { status: this.status, adInfo })
         this.closeEmitter()
     }
 
@@ -97,8 +97,8 @@ export abstract class DefaultEngine extends Gear {
 
     async startFlowInEngine(to: string, flow: DefaultFlow): Promise<void> {
         if (!flow.inSession(to)) {
-            flow.getEmitter().on("g.flow.msg", (to, msg) => this.send(to, msg));
-            flow.getEmitter().on("g.flow", (msg) => this.getEmitter().emit("g.flow", msg));
+            flow.getEmitter().on("gear.message.send", (to, msg) => this.send(to, msg));
+            flow.getEmitter().on("gear.flow.end", (msg) => this.getEmitter().emit("gear.flow.end", msg));
             flow.start(to, this.getEmitter());
         }
 

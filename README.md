@@ -96,7 +96,7 @@ async monitoring() {
     while (this.status === 'connected') {
         const text = await rl.question("");
         const author = "you";
-        this.getEmitter().emit('g.msg', { type: "text", author, text, isGroup: false });
+        this.getEmitter().emit('gear.message.received', { type: "text", author, text, isGroup: false });
         
         if (this.commander?.isCommand(text)) {
             const { command, args } = this.commander.extractCommandAndArgs(text);
@@ -234,7 +234,7 @@ So far there are 3 types of MessageFlow:
     ```
 > the first MessageFlow to be added to the flow is the first one to be sent right after sending the firstMessage
 
-> at the end of the flow, a `g.flow` event will be fired to the transporter.
+> at the end of the flow, a `gear.flow.end` event will be fired to the transporter.
 
 
 #### 🎯 First and last messages in flow:
