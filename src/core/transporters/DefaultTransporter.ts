@@ -5,7 +5,6 @@
 import { Gear } from "../Gear";
 import { IMessageConnection } from "../../interfaces/IMessageConnection";
 import { IMessageReceived } from "../../interfaces/IMessageReceived";
-import { DefaultMessageFlow } from "../flows/DefaultMessageFlow";
 import { IFlowResponse } from "../../interfaces/IFlowResponse";
 
 /**

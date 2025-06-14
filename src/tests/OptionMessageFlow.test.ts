@@ -32,7 +32,7 @@ describe("test OptionMessageFlow cases", () => {
         flow.start(chatId, engineEmitter);
 
 
-        engineEmitter.emit("g.msg", {
+        engineEmitter.emit("gear.message.received", {
             author: chatId,
             isMe: false,
             text: "1",
@@ -43,7 +43,7 @@ describe("test OptionMessageFlow cases", () => {
         });
 
 
-        engineEmitter.emit("g.msg", {
+        engineEmitter.emit("gear.message.received", {
             author: chatId,
             isMe: false,
             text: "i like number 1",
@@ -53,13 +53,13 @@ describe("test OptionMessageFlow cases", () => {
             chatId
         });
 
-        expect(emitSpy).toHaveBeenCalledWith("g.flow.msg", chatId, step1.getMessages()[0]);
-        expect(emitSpy).toHaveBeenCalledWith("g.flow.msg", chatId, opt1.getMessages()[0]);
-        expect(emitSpy).not.toHaveBeenCalledWith("g.flow.msg", chatId, opt2.getMessages()[0]);
-        expect(emitSpy).not.toHaveBeenCalledWith("g.flow.msg", chatId, opt3.getMessages()[0]);
+        expect(emitSpy).toHaveBeenCalledWith("gear.message.send", chatId, step1.getMessages()[0]);
+        expect(emitSpy).toHaveBeenCalledWith("gear.message.send", chatId, opt1.getMessages()[0]);
+        expect(emitSpy).not.toHaveBeenCalledWith("gear.message.send", chatId, opt2.getMessages()[0]);
+        expect(emitSpy).not.toHaveBeenCalledWith("gear.message.send", chatId, opt3.getMessages()[0]);
 
 
-        expect(emitSpy).toHaveBeenCalledWith("g.flow", {
+        expect(emitSpy).toHaveBeenCalledWith("gear.flow.end", {
             name: "test-flow",
             chatId,
             messages: expect.any(Array)
@@ -87,7 +87,7 @@ describe("test OptionMessageFlow cases", () => {
         flow.start(chatId, engineEmitter);
 
 
-        engineEmitter.emit("g.msg", {
+        engineEmitter.emit("gear.message.received", {
             author: chatId,
             isMe: false,
             text: "5",
@@ -100,14 +100,14 @@ describe("test OptionMessageFlow cases", () => {
 
         expect(step1.getMessages().length).toEqual(2)
 
-        expect(emitSpy).toHaveBeenCalledWith("g.flow.msg", chatId, step1.getMessages()[0]);
-        expect(emitSpy).toHaveBeenCalledWith("g.flow.msg", chatId, step1.getMessages()[1]);
+        expect(emitSpy).toHaveBeenCalledWith("gear.message.send", chatId, step1.getMessages()[0]);
+        expect(emitSpy).toHaveBeenCalledWith("gear.message.send", chatId, step1.getMessages()[1]);
 
-        expect(emitSpy).not.toHaveBeenCalledWith("g.flow.msg", chatId, opt1.getMessages()[0]);
-        expect(emitSpy).not.toHaveBeenCalledWith("g.flow.msg", chatId, opt2.getMessages()[0]);
-        expect(emitSpy).not.toHaveBeenCalledWith("g.flow.msg", chatId, opt3.getMessages()[0]);
+        expect(emitSpy).not.toHaveBeenCalledWith("gear.message.send", chatId, opt1.getMessages()[0]);
+        expect(emitSpy).not.toHaveBeenCalledWith("gear.message.send", chatId, opt2.getMessages()[0]);
+        expect(emitSpy).not.toHaveBeenCalledWith("gear.message.send", chatId, opt3.getMessages()[0]);
 
-        engineEmitter.emit("g.msg", {
+        engineEmitter.emit("gear.message.received", {
             author: chatId,
             isMe: false,
             text: "2",
@@ -116,7 +116,7 @@ describe("test OptionMessageFlow cases", () => {
             messageId: "1",
             chatId
         });
-        engineEmitter.emit("g.msg", {
+        engineEmitter.emit("gear.message.received", {
             author: chatId,
             isMe: false,
             text: "i like number 2",
@@ -127,9 +127,9 @@ describe("test OptionMessageFlow cases", () => {
         });
 
       
-        expect(emitSpy).toHaveBeenCalledWith("g.flow.msg", chatId, opt2.getMessages()[0]);
+        expect(emitSpy).toHaveBeenCalledWith("gear.message.send", chatId, opt2.getMessages()[0]);
 
-        expect(emitSpy).toHaveBeenCalledWith("g.flow", {
+        expect(emitSpy).toHaveBeenCalledWith("gear.flow.end", {
             name: "test-flow",
             chatId,
             messages: expect.any(Array)

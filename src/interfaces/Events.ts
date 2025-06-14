@@ -5,9 +5,8 @@ import { IMessageReceived } from "./IMessageReceived";
 import { IMessageSend } from "./IMessageSend";
 
 export interface Events {
-    'g.conn': (msg: IMessageConnection) => void;
-    'g.msg': (msg: IMessageReceived) => void;
-    'g.flow': (msg: IFlowResponse) => void;
-    'g.flow.msg': (to: string, msg: IMessageSend) => void;
-
+    'gear.connection.status': (msg: IMessageConnection) => void;
+    'gear.message.received': (msg: IMessageReceived) => void;
+    'gear.flow.end': (msg: IFlowResponse) => void;
+    'gear.message.send': (to: string, msg: IMessageSend) => void;
 }

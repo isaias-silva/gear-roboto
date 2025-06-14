@@ -119,13 +119,13 @@ export class DefaultFlow extends Gear {
 
 
         if (this.firstMessage) {
-            this.getEmitter().emit("g.flow.msg", chatId, this.firstMessage);
+            this.getEmitter().emit("gear.message.send", chatId, this.firstMessage);
         }
 
         const timer = this.options?.waitingTimeForResponseMs
             ? new Timer(this.options.waitingTimeForResponseMs, () => {
                 if (this.options?.timeoutMessage) {
-                    this.getEmitter().emit("g.flow.msg", chatId, this.options?.timeoutMessage);
+                    this.getEmitter().emit("gear.message.send", chatId, this.options?.timeoutMessage);
                 }
                 this.end(chatId, engineEmitter);
             })
@@ -158,12 +158,12 @@ export class DefaultFlow extends Gear {
                     const nextMessage = sessionMessages.get(nextId);
 
                     if (nextMessage) {
-                        nextMessage.getMessages().forEach((msg) => this.getEmitter().emit("g.flow.msg", chatId, msg));
+                        nextMessage.getMessages().forEach((msg) => this.getEmitter().emit("gear.message.send", chatId, msg));
                         currentMessage = nextMessage;
                     }
                 } else {
                     if (this.lastMessage) {
-                        this.getEmitter().emit("g.flow.msg", chatId, this.lastMessage);
+                        this.getEmitter().emit("gear.message.send", chatId, this.lastMessage);
                     }
                     if (timer) {
                         timer?.stop();
@@ -175,9 +175,9 @@ export class DefaultFlow extends Gear {
 
         this.sessions.set(chatId, { listener, sessionMessages });
 
-        engineEmitter.on("g.msg", listener);
+        engineEmitter.on("gear.message.received", listener);
 
-        currentMessage.getMessages().forEach((msg) => this.getEmitter().emit("g.flow.msg", chatId, msg));
+        currentMessage.getMessages().forEach((msg) => this.getEmitter().emit("gear.message.send", chatId, msg));
     }
 
     /**
@@ -189,7 +189,7 @@ export class DefaultFlow extends Gear {
     stop(chatId: string, engineEmitter: EventGearEmitter): void {
         const session = this.sessions.get(chatId);
         if (session) {
-            engineEmitter.removeListener("g.msg", session.listener);
+            engineEmitter.removeListener("gear.message.received", session.listener);
             this.sessions.delete(chatId);
         }
         if (this.sessions.size === 0) {
@@ -211,7 +211,7 @@ export class DefaultFlow extends Gear {
         }
         const session = this.sessions.get(chatId);
         if (session) {
-            this.getEmitter().emit("g.flow", {
+            this.getEmitter().emit("gear.flow.end", {
                 name: this.name,
                 chatId,
                 messages: this.getObjectMessages(chatId)

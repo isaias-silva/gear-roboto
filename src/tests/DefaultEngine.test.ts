@@ -29,7 +29,7 @@ describe("test engine", () => {
 
         engine.connect(["id-test"])
 
-        expect(mockEmit).toHaveBeenCalledWith('g.conn', {
+        expect(mockEmit).toHaveBeenCalledWith('gear.connection.status', {
             status: 'connected',
             adInfo: expect.any(Map)
         });
@@ -42,7 +42,7 @@ describe("test engine", () => {
         engine.disconnect(["id-test"])
 
 
-        expect(mockEmit).toHaveBeenCalledWith('g.conn', {
+        expect(mockEmit).toHaveBeenCalledWith('gear.connection.status', {
             status: 'disconnected',
             adInfo: expect.any(Map)
         });
