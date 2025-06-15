@@ -1,6 +1,7 @@
 # Gear-roboto
-
-<img src="logo.png" style="width:200px">
+![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white)
+![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
+![eventEmitter](https://img.shields.io/badge/event-emitter-blue)
 
 **gear-roboto** is a mini framework for creating and organizing chatbot logic, allowing message transport message flow and event monitoring.
 
@@ -33,6 +34,18 @@ main();
 
 ---
 ## 🛠 Main Structure
+the main classes of the library such as transporters, engines and flows are child classes of the Gear class, a Gear has an event emitter to ensure communication between the gears managed by the chatbot.
+
+Gear events:
+|event | description  |
+|-------|----------------|
+|gear.connection.status | connection events |
+|gear.message.received|  received message events|
+|gear.message.send | message sending request(flow) |
+|gear.flow.end     |end flow in chat |
+
+The DefaultChatbot class manages the engine events and their sending to the transporters, but its emitters can be accessed outside the chatbot, as occurs in flows, through the method inherited from Gear, the .getEmitter() method.
+___________________
 
 The library has four main classes:
 
