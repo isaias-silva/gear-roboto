@@ -9,4 +9,5 @@ export interface Events {
     'gear.message.received': (msg: IMessageReceived) => void;
     'gear.flow.end': (msg: IFlowResponse) => void;
     'gear.message.send': (to: string, msg: IMessageSend) => void;
+    'gear.message.send.confirm': (to: string, msg: IMessageSend) => void;
 }
