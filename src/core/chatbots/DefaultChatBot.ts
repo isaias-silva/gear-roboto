@@ -102,6 +102,7 @@ export class DefaultChatBot<E extends DefaultEngine, T extends DefaultTransporte
 
 
     protected async observer(): Promise<void> {
+        this.engine.getEmitter().on("gear.message.send.confirm", (to, msg) => this.transporter.transportMessageSenderConfirmInfo(to, msg))
         this.engine.getEmitter().on("gear.connection.status", (msg) => this.transporter.transportInfoConn(msg));
         this.engine.getEmitter().on("gear.message.received", (msg) => this.transporter.transportInfoMsg(msg));
         this.engine.getEmitter().on("gear.flow.end", (msg) => this.transporter.transportInfoFlow(msg))
