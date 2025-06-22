@@ -6,7 +6,7 @@ import { Gear } from "../Gear";
 import { IMessageConnection } from "../../interfaces/IMessageConnection";
 import { IMessageReceived } from "../../interfaces/IMessageReceived";
 import { IFlowResponse } from "../../interfaces/IFlowResponse";
-import { IMessageSend } from "../../interfaces";
+import { IMessageSend, TransportMessage } from "../../interfaces";
 
 /**
  * A transporter class responsible for logging connection and message information.
@@ -15,10 +15,10 @@ import { IMessageSend } from "../../interfaces";
 export abstract class DefaultTransporter extends Gear {
     /**
      * Logs connection information if logging is enabled.
-     * @param {IMessageConnection} msg - The message containing connection information.
+     * @param {TransportMessage<IMessageConnection>} msg - The message containing connection information.
      */
 
-    transportInfoConn(msg: IMessageConnection): void {
+    transportInfoConn(msg: TransportMessage<IMessageConnection>): void {
         if (this.enableLogs) {
             this.logger.info(msg);
         }
@@ -27,9 +27,9 @@ export abstract class DefaultTransporter extends Gear {
 
     /**
      * Logs received message information if logging is enabled.
-     * @param {IMessageReceived} msg - The message containing details of the received communication.
+     * @param {TransportMessage<IMessageReceived>} msg - The message containing details of the received communication.
      */
-    transportInfoMsg(msg: IMessageReceived): void {
+    transportInfoMsg(msg: TransportMessage<IMessageReceived>): void {
         if (this.enableLogs) {
             this.logger.info(msg);
         }
@@ -37,9 +37,9 @@ export abstract class DefaultTransporter extends Gear {
     }
     /**
   * Logs received message confirm sender information if logging is enabled.
-  * @param {IFlowResponse} msg - The message containing details of the message send communication.
+  * @param {TransportMessage<IMessageReceived>} msg - The message containing details of the message send communication.
   */
-    transportMessageSenderConfirmInfo(to: string, msg: IMessageSend): void {
+    transportMessageSenderConfirmInfo(to: string, msg: TransportMessage<IMessageSend>): void {
         if (this.enableLogs) {
             this.logger.info(msg);
         }
@@ -49,9 +49,9 @@ export abstract class DefaultTransporter extends Gear {
 
     /**
   * Logs received flow information if logging is enabled.
-  * @param {IFlowResponse} msg - The message containing details of the flow communication.
+  * @param {TransportMessage<IFlowResponse>} msg - The message containing details of the flow communication.
   */
-    transportInfoFlow(msg: IFlowResponse): void {
+    transportInfoFlow(msg: TransportMessage<IFlowResponse>): void {
         if (this.enableLogs) {
             this.logger.info(msg);
         }
@@ -60,34 +60,34 @@ export abstract class DefaultTransporter extends Gear {
 
     /**
      * treat msg object
-     * @param {IFlowResponse} msg - The message containing details of the flow.
+     * @param {TransportMessage<IFlowResponse>} msg - The message containing details of the flow.
      */
-    protected treatInfoFlow(msg: IFlowResponse) {
+    protected treatInfoFlow(msg: TransportMessage<IFlowResponse>) {
 
     }
 
     /**
      * treat msg object
-     * @param {IMessageConnection} msg - The message containing details of the received communication.
+     * @param {TransportMessage<IMessageConnection>} msg - The message containing details of the received communication.
      */
-    protected treatInfoConn(msg: IMessageConnection) {
+    protected treatInfoConn(msg: TransportMessage<IMessageConnection>) {
 
     }
 
     /**
      * treat msg object
-     * @param {IMessageConnection} msg - The message containing details of the received communication.
+     * @param {TransportMessage<IMessageReceived>} msg - The message containing details of the received communication.
      */
-    protected treatInfoMsg(msg: IMessageReceived) {
+    protected treatInfoMsg(msg: TransportMessage<IMessageReceived>) {
 
     }
 
     /**
    * treat msg object
    * @param {String} to - id that received the message.
-   * @param {IMessageSend} msg - The message containing details of the received communication.
+   * @param {TransportMessage<IMessageSend>} msg - The message containing details of the received communication.
    */
-    protected treatInfoMessageSendConfirm(to: string, msg: IMessageSend) {
+    protected treatInfoMessageSendConfirm(to: string, msg: TransportMessage<IMessageSend>) {
 
     }
 }

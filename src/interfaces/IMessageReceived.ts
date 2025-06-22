@@ -9,5 +9,6 @@ export interface IMessageReceived {
     isGroup: boolean,
     messageId: string,
     isMe: boolean,
-    replyMessage?:IMessageReceived
+    replyMessage?:IMessageReceived,
+    
 }

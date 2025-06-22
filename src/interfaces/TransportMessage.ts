@@ -1,0 +1,1 @@
+export type TransportMessage<T> = { adInfo?: Map<string, string> } & T;

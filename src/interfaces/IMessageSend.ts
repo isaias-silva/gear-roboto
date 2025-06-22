@@ -7,4 +7,5 @@ export interface IMessageSend {
     type: messageType,
     media?: Buffer | string,
     opts?: { text: string, value: string }[]
+   
 }
