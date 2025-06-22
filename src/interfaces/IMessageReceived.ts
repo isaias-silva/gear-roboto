@@ -10,5 +10,5 @@ export interface IMessageReceived {
     messageId: string,
     isMe: boolean,
     replyMessage?:IMessageReceived,
-    adInfo:Map<String,String>
+    
 }
