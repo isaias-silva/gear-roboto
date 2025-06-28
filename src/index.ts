@@ -7,4 +7,5 @@ export * from './core/tools'
 export * from './interfaces'
 export * from './types'
 export * from './exceptions'
+export * from './core'
 
