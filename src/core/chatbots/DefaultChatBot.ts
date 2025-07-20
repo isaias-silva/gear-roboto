@@ -23,16 +23,16 @@ export class DefaultChatBot<E extends DefaultEngine, T extends DefaultTransporte
     /**
      * The engine responsible for managing chatbot logic.
      * @type {E}
-     * @private
+     * @protected
      */
-    private engine: E;
+    protected engine: E;
 
     /**
      * The transporter responsible for handling message transport.
      * @type {T}
-     * @private
+     * @protected
      */
-    private transporter: T;
+    protected transporter: T;
 
     /**
      * Creates a new instance of DefaultChatBot.
