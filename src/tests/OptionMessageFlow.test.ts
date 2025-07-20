@@ -33,7 +33,7 @@ describe("test OptionMessageFlow cases", () => {
 
 
         engineEmitter.emit("gear.message.received", {
-            author: chatId,
+            title: chatId,
             isMe: false,
             text: "1",
             type: "text",
@@ -44,7 +44,7 @@ describe("test OptionMessageFlow cases", () => {
 
 
         engineEmitter.emit("gear.message.received", {
-            author: chatId,
+            title: chatId,
             isMe: false,
             text: "i like number 1",
             type: "text",
@@ -88,7 +88,7 @@ describe("test OptionMessageFlow cases", () => {
 
 
         engineEmitter.emit("gear.message.received", {
-            author: chatId,
+            title: chatId,
             isMe: false,
             text: "5",
             type: "text",
@@ -108,7 +108,7 @@ describe("test OptionMessageFlow cases", () => {
         expect(emitSpy).not.toHaveBeenCalledWith("gear.message.send", chatId, opt3.getMessages()[0]);
 
         engineEmitter.emit("gear.message.received", {
-            author: chatId,
+            title: chatId,
             isMe: false,
             text: "2",
             type: "text",
@@ -117,7 +117,7 @@ describe("test OptionMessageFlow cases", () => {
             chatId
         });
         engineEmitter.emit("gear.message.received", {
-            author: chatId,
+            title: chatId,
             isMe: false,
             text: "i like number 2",
             type: "text",

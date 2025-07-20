@@ -36,7 +36,7 @@ describe("test transporter", () => {
         transporter.transportInfoMsg({
             type: "text",
             messageId: "mock-id",
-            author: "mock-author",
+            title: "mock-author",
             isGroup: false,
             isMe: false,
             chatId: "mock-id"

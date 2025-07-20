@@ -87,7 +87,7 @@ describe("test flow", () => {
 
 
         engineEmitter.emit("gear.message.received", {
-            author: chatId,
+            title: chatId,
             isMe: false,
             text: "world",
             type: "text",
@@ -98,7 +98,7 @@ describe("test flow", () => {
 
 
         engineEmitter.emit("gear.message.received", {
-            author: chatId,
+            title: chatId,
             isMe: false,
             text: "agony",
             type: "text",
@@ -147,7 +147,7 @@ describe("test flow", () => {
 
 
         engineEmitter.emit("gear.message.received", {
-            author: chatId,
+            title: chatId,
             isMe: false,
             text: "world",
             type: "text",
@@ -158,7 +158,7 @@ describe("test flow", () => {
 
 
         engineEmitter.emit("gear.message.received", {
-            author: chatId,
+            title: chatId,
             isMe: false,
             text: "agony",
             type: "text",
@@ -201,7 +201,7 @@ describe("test flow", () => {
         expect(flow.inSession("mock-two")).toBe(true)
 
         engineEmitter.emit("gear.message.received", {
-            author: "mock-one",
+            title: "mock-one",
             isMe: false,
             text: "world",
             type: "text",
@@ -212,7 +212,7 @@ describe("test flow", () => {
 
 
         engineEmitter.emit("gear.message.received", {
-            author: "mock-two",
+            title: "mock-two",
             isMe: false,
             text: "world 2",
             type: "text",
@@ -259,7 +259,7 @@ describe("test flow", () => {
         const sends = Promise.all([
             (async () => {
                 engineEmitter.emit("gear.message.received", {
-                    author: "promise-boy",
+                    title: "promise-boy",
                     isMe: false,
                     text: "hi i am a boy",
                     type: "text",
@@ -270,7 +270,7 @@ describe("test flow", () => {
             })(),
             (async () => {
                 engineEmitter.emit("gear.message.received", {
-                    author: "promise-girl",
+                    title: "promise-girl",
                     isMe: false,
                     text: "hi i am a girl",
                     type: "text",
@@ -317,7 +317,7 @@ describe("test flow", () => {
         expect(flowTwoResponses.inSession("two-response-man")).toBe(true)
 
         engineEmitter.emit("gear.message.received", {
-            author: "two-response-man",
+            title: "two-response-man",
             chatId: "two-response-man",
             type: "text",
             isGroup: false,
@@ -329,7 +329,7 @@ describe("test flow", () => {
         expect(flowTwoResponses.inSession("two-response-man")).toBe(true)
 
         engineEmitter.emit("gear.message.received", {
-            author: "two-response-man",
+            title: "two-response-man",
             chatId: "two-response-man",
             type: "text",
             isGroup: false,
@@ -390,7 +390,7 @@ describe("test flow", () => {
         jest.advanceTimersByTime(1000);
 
         engineEmitter.emit("gear.message.received", {
-            author: "no-response-man",
+            title: "no-response-man",
             chatId: "no-response-man",
             type: "text",
             isGroup: false,
@@ -406,7 +406,7 @@ describe("test flow", () => {
         });
 
         engineEmitter.emit("gear.message.received", {
-            author: "no-response-man",
+            title: "no-response-man",
             chatId: "no-response-man",
             type: "text",
             isGroup: false,
