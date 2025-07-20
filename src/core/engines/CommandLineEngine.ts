@@ -9,12 +9,12 @@ export class CommandLineEngine extends DefaultEngine {
         const { text, type } = message
         this.getEmitter().emit('gear.message.received', {
             type,
-            author: "me",
-            chatId:"me",
+            title: "me",
+            chatId: "me",
             text,
-             isGroup: false, 
-             messageId: Math.random().toString(32), 
-             isMe: true
+            isGroup: false,
+            messageId: Math.random().toString(32),
+            isMe: true
         });
 
     }
@@ -27,12 +27,12 @@ export class CommandLineEngine extends DefaultEngine {
         while (this.status == 'connected') {
 
             const text = await rl.question("")
-            const author = "you"
+            const title = "you"
 
             this.getEmitter().emit('gear.message.received', {
                 type: "text",
-                chatId: author,
-                author,
+                chatId: title,
+                title,
                 text,
                 isGroup: false,
                 messageId: Math.random().toString(32),
@@ -44,9 +44,9 @@ export class CommandLineEngine extends DefaultEngine {
 
                 const fun = this.commander.searchCommand(command)
                 if (fun) {
-                    fun(this, author, args)
+                    fun(this, title, args)
                 } else {
-                    this.send(author, { type: "text", text: "command not found" })
+                    this.send(title, { type: "text", text: "command not found" })
                 }
             }
 
