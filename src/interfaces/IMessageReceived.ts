@@ -1,7 +1,9 @@
 import { messageType } from "../types/MessageType";
 
+
 export interface IMessageReceived {
-    author: string,
+    title: string,
+    author?: IAuthor,
     chatId: string,
     text?: string,
     type: messageType,
@@ -9,6 +11,13 @@ export interface IMessageReceived {
     isGroup: boolean,
     messageId: string,
     isMe: boolean,
-    replyMessage?:IMessageReceived,
-    
+    replyMessage?: IMessageReceived,
+    profile?: string
+
+}
+
+export interface IAuthor {
+    name: string,
+    alias: string,
+    profile?: string,
 }

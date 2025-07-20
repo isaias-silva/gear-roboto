@@ -34,7 +34,7 @@ describe("test KeyWordMessageFlow cases", () => {
 
 
         engineEmitter.emit("gear.message.received", {
-            author: chatId,
+            title: chatId,
             isMe: false,
             text: "not",
             type: "text",
@@ -45,7 +45,7 @@ describe("test KeyWordMessageFlow cases", () => {
 
 
         engineEmitter.emit("gear.message.received", {
-            author: chatId,
+            title: chatId,
             isMe: false,
             text: "will not be answered",
             type: "text",
@@ -89,7 +89,7 @@ describe("test KeyWordMessageFlow cases", () => {
         expect(emitSpy).toHaveBeenCalledWith("gear.message.send", chatId, step1.getMessages()[0]);
 
         engineEmitter.emit("gear.message.received", {
-            author: chatId,
+            title: chatId,
             isMe: false,
             text: "yes",
             type: "text",
@@ -101,7 +101,7 @@ describe("test KeyWordMessageFlow cases", () => {
          expect(emitSpy).toHaveBeenCalledWith("gear.message.send", chatId, step2.getMessages()[0]);
 
         engineEmitter.emit("gear.message.received", {
-            author: chatId,
+            title: chatId,
             isMe: false,
             text: "john",
             type: "text",
