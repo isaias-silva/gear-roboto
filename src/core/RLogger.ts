@@ -1,17 +1,26 @@
 import pino, { Logger } from "pino";
-
+import os from 'os'
 export class RLogger {
     private logger: Logger
 
     constructor(className: string) {
-        const isTest = process.env.NODE_ENV == 'test';
 
-        this.logger = pino(isTest ? {} : {
-            base: { class: className },
-            transport: {
+        const isDevelopment = process.env.MODE == "dev"
+        const config = {
+            transport: isDevelopment ? {
                 target: 'pino-pretty'
-            }
-        })
+            } : undefined,
+
+            base: {
+                name: className,
+                service:"gear-roboto",
+                pid: process.pid,
+                hostname: os.hostname(),
+            },
+           
+            timestamp: pino.stdTimeFunctions.isoTime
+        }
+        this.logger = pino(config)
     }
 
     private log(level: 'info' | 'error' | 'warn', message: any): void {
