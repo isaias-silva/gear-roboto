@@ -12,8 +12,8 @@ export interface IMessageReceived {
     messageId: string,
     isMe: boolean,
     replyMessage?: IMessageReceived,
-    profile?: string
-
+    profile?: string,
+    receivedAt?: string
 }
 
 export interface IAuthor {
