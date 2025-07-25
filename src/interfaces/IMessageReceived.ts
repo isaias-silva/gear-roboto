@@ -13,7 +13,7 @@ export interface IMessageReceived {
     isMe: boolean,
     replyMessage?: IMessageReceived,
     profile?: string
-
+    receivedAt?: string
 }
 
 export interface IAuthor {
